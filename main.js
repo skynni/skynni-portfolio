@@ -50,13 +50,18 @@ function easeInOutCubic(t) {
 /**
  * Smooth-scroll to a given Y position over `duration` ms.
  */
-function smoothScrollTo(targetY, duration = 700) {
+function smoothScrollTo(targetY, duration = 550) {
   const startY = window.scrollY;
   const distance = targetY - startY;
+
+  // Jeśli odległość do celu jest znikoma — nie animujemy
+  if (Math.abs(distance) < 1) return;
+
   let startTime = null;
 
   function step(timestamp) {
-    if (!startTime) startTime = timestamp;
+    // Inicjalizacja dokładnie w pierwszej klatce — brak poczekania
+    if (startTime === null) startTime = timestamp;
     const elapsed = timestamp - startTime;
     const progress = Math.min(elapsed / duration, 1);
     window.scrollTo(0, startY + distance * easeInOutCubic(progress));

@@ -73,7 +73,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth — wyłączone; własna animacja JS w main.js */
   scroll-padding-top: 80px;
   font-size: 16px;
 }
