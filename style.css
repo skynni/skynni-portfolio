@@ -321,13 +321,14 @@ ol {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.8rem;
+  gap: 0.35rem 0.5rem;
+  font-size: clamp(0.6rem, 2vw, 0.8rem);
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--c-ink-muted);
   margin-bottom: var(--space-md);
+  padding-inline: var(--space-sm);
   animation: fadeUp 0.7s var(--ease-out) both;
 }
 
@@ -741,9 +742,12 @@ ol {
   font-weight: 600;
   color: var(--c-muzyka-ink);
   margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Tytuł zawsze widoczny w całości — bez ucięcia */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .music-track__genre {
@@ -1062,13 +1066,15 @@ ol {
     display: flex;
   }
 
+  /* Karty postaci — równe 2 kolumny na tabletach */
   .characters-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-sm);
   }
 
   .music-track {
     flex-wrap: wrap;
+    gap: var(--space-sm);
   }
 
   .music-track__num {
@@ -1087,14 +1093,36 @@ ol {
     flex-direction: column;
     align-items: center;
   }
+
+  /* Scroll indicator — ukryj na małych ekranach żeby nie nachodził na przyciski */
+  .hero__scroll {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
+  /* Karty postaci — 2 równe kolumny na telefonie */
   .characters-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
   .nav {
     padding: 0 var(--space-md);
+  }
+
+  /* Tytuł utworu muzycznego — pełna szerokość na małym ekranie */
+  .music-track__info {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  /* Eyebrow — zmniejsz separator żeby lepiej się łamał */
+  .hero__eyebrow-sep {
+    display: none;
+  }
+
+  .hero__eyebrow {
+    gap: 0.4rem 0.8rem;
+    letter-spacing: 0.1em;
   }
 }
