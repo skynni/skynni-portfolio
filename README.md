@@ -22,14 +22,14 @@ Polskie covery piosenek z musicali animowanych dostępne na Spotify i YouTube.
 
 ---
 
-## Strona – skynni.pl
+## Strona - skynni.pl
 
 ### Sekcje
 
 | Sekcja | Kotwica | Opis |
 |---|---|---|
 | Hero | `#hero` | Prezentacja i CTA |
-| Dubbing | `#dubbing` | Role głosowe – fandubbing i oficjalny dubbing |
+| Dubbing | `#dubbing` | Role głosowe - fandubbing i oficjalny dubbing |
 | Muzyka | `#muzyka` | Polskie covery piosenek z musicali animowanych |
 | Lektorstwo | `#lektorstwo` | Reklamy, e-learning, nagrania radiowe |
 | Kontakt | `#kontakt` | Media społecznościowe i e-mail |
