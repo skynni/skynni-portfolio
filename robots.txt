@@ -1,0 +1,58 @@
+# =============================================================
+#  robots.txt – skynni.pl
+#  Damian „skynni" Pająk – Aktor Głosowy, Lektor & Wokalista
+#  Ostatnia aktualizacja: 2026-08-17
+# =============================================================
+
+# --- Wszystkie roboty (domyślna polityka) --------------------
+User-agent: *
+Allow: /
+Disallow: /assets/audio/    # pliki audio – nie indeksuj bezpośrednich ścieżek
+Crawl-delay: 10
+
+# --- Googlebot --------------------------------------------------
+User-agent: Googlebot
+Allow: /
+Allow: /assets/images/
+Disallow: /assets/audio/
+Crawl-delay: 5
+
+# --- Googlebot-Image (obrazy OG, karty postaci) ---------------
+User-agent: Googlebot-Image
+Allow: /assets/images/
+
+# --- Bingbot ----------------------------------------------------
+User-agent: Bingbot
+Allow: /
+Allow: /assets/images/
+Disallow: /assets/audio/
+Crawl-delay: 10
+
+# --- Roboty AI (modele językowe i crawlery AI) ----------------
+#  Blokujemy trenowanie modeli AI na treściach portoflio
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+# --- Sitemap ----------------------------------------------------
+Sitemap: https://skynni.pl/sitemap.xml
