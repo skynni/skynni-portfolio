@@ -73,7 +73,7 @@
 }
 
 html {
-  /* scroll-behavior: smooth — wyłączone; własna animacja JS w main.js */
+  /* scroll-behavior: smooth jest wyłączone — płynne przewijanie obsługuje JS (smoothScrollTo) */
   scroll-padding-top: 80px;
   font-size: 16px;
 }
@@ -288,16 +288,12 @@ ol {
     linear-gradient(90deg, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
   background-size: 32px 32px;
   /* Fade at all 4 edges via radial mask */
-  -webkit-mask-image: radial-gradient(
-    ellipse 85% 85% at 50% 50%,
-    black 30%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse 85% 85% at 50% 50%,
-    black 30%,
-    transparent 100%
-  );
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%,
+      black 30%,
+      transparent 100%);
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%,
+      black 30%,
+      transparent 100%);
 }
 
 /* Noise texture overlay */
@@ -312,7 +308,8 @@ ol {
   position: relative;
   z-index: 1;
   text-align: center;
-  padding: var(--space-xl) var(--space-md);
+  /* Dolny padding zapewnia miejsce dla wskaźnika scroll (abs. bottom: 2rem + ~80px wysokości) */
+  padding: var(--space-xl) var(--space-md) 7rem;
   max-width: 860px;
 }
 
@@ -380,7 +377,13 @@ ol {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  /* pointer-events: none żeby nie blokował kliknięć w treść */
+  pointer-events: none;
   animation: fadeUp 1s 0.8s var(--ease-out) both;
+  /* Ukryj gdy ekran jest za niski — zakryłby treść */
+  @media (max-height: 560px) {
+    display: none;
+  }
 }
 
 .hero__scroll span {
@@ -394,11 +397,11 @@ ol {
   width: 1px;
   height: 40px;
   background: linear-gradient(to bottom, var(--c-ink-subtle), transparent);
+  transform-origin: top;
   animation: scrollLine 2s ease-in-out infinite;
 }
 
 @keyframes scrollLine {
-
   0%,
   100% {
     transform: scaleY(1);
@@ -406,8 +409,8 @@ ol {
   }
 
   50% {
-    transform: scaleY(0.5);
-    opacity: 0.4;
+    transform: scaleY(0.4);
+    opacity: 0;
   }
 }
 
@@ -964,9 +967,11 @@ ol {
 
 .reveal {
   opacity: 0;
-  transform: translateY(32px);
-  transition: opacity var(--dur-slow) var(--ease-out),
-    transform var(--dur-slow) var(--ease-out);
+  transform: translateY(28px);
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 600ms var(--ease-out);
+  will-change: opacity, transform;
 }
 
 .reveal.visible {
@@ -974,55 +979,26 @@ ol {
   transform: translateY(0);
 }
 
-/* Stagger children */
-.reveal-stagger>* {
+/* Stagger children — każde dziecko ma własną klasę reveal */
+.reveal-stagger > * {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity var(--dur-slow) var(--ease-out),
-    transform var(--dur-slow) var(--ease-out);
+  transform: translateY(20px);
+  transition:
+    opacity 550ms var(--ease-out),
+    transform 550ms var(--ease-out);
+  will-change: opacity, transform;
 }
 
-.reveal-stagger.visible>*:nth-child(1) {
-  transition-delay: 0ms;
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.visible>*:nth-child(2) {
-  transition-delay: 80ms;
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.visible>*:nth-child(3) {
-  transition-delay: 160ms;
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.visible>*:nth-child(4) {
-  transition-delay: 240ms;
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.visible>*:nth-child(5) {
-  transition-delay: 320ms;
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.visible > *:nth-child(6) {
-  transition-delay: 400ms;
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-stagger.visible > *:nth-child(7) {
-  transition-delay: 480ms;
-  opacity: 1;
-  transform: none;
-}
+.reveal-stagger.visible > *:nth-child(1)  { transition-delay:   0ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(2)  { transition-delay:  70ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(3)  { transition-delay: 140ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(4)  { transition-delay: 210ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(5)  { transition-delay: 280ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(6)  { transition-delay: 350ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(7)  { transition-delay: 420ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(8)  { transition-delay: 490ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(9)  { transition-delay: 560ms; opacity: 1; transform: none; }
+.reveal-stagger.visible > *:nth-child(10) { transition-delay: 630ms; opacity: 1; transform: none; }
 
 /* ===========================
    RESPONSIVE
@@ -1101,6 +1077,7 @@ ol {
 }
 
 @media (max-width: 480px) {
+
   /* Karty postaci — 2 równe kolumny na telefonie */
   .characters-grid {
     grid-template-columns: repeat(2, 1fr);

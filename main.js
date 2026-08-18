@@ -47,28 +47,39 @@ function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+// Track the current animation frame so we can cancel mid-scroll
+let scrollRafId = null;
+
 /**
  * Smooth-scroll to a given Y position over `duration` ms.
  */
-function smoothScrollTo(targetY, duration = 550) {
+function smoothScrollTo(targetY, duration = 700) {
+  // Cancel any in-flight scroll animation
+  if (scrollRafId !== null) {
+    cancelAnimationFrame(scrollRafId);
+    scrollRafId = null;
+  }
+
   const startY = window.scrollY;
   const distance = targetY - startY;
 
-  // Jeśli odległość do celu jest znikoma — nie animujemy
+  // Nothing to do
   if (Math.abs(distance) < 1) return;
 
-  let startTime = null;
+  const startTime = performance.now();
 
-  function step(timestamp) {
-    // Inicjalizacja dokładnie w pierwszej klatce — brak poczekania
-    if (startTime === null) startTime = timestamp;
-    const elapsed = timestamp - startTime;
+  function step(now) {
+    const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
     window.scrollTo(0, startY + distance * easeInOutCubic(progress));
-    if (progress < 1) requestAnimationFrame(step);
+    if (progress < 1) {
+      scrollRafId = requestAnimationFrame(step);
+    } else {
+      scrollRafId = null;
+    }
   }
 
-  requestAnimationFrame(step);
+  scrollRafId = requestAnimationFrame(step);
 }
 
 /**
