@@ -102,7 +102,11 @@ document.addEventListener('click', (e) => {
   navLinksList.classList.remove('open');
   hamburger.setAttribute('aria-expanded', 'false');
 
-  const targetY = target.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT;
+  // Per-section extra offset (positive = scroll further down / lower anchor)
+  const SECTION_EXTRA_OFFSET = { dubbing: 100 };
+  const extraOffset = SECTION_EXTRA_OFFSET[targetId] ?? 0;
+
+  const targetY = target.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT + extraOffset;
   smoothScrollTo(Math.max(0, targetY));
 
   // Update URL hash without jumping
