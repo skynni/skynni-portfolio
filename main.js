@@ -208,7 +208,7 @@ function initPlayer(playerEl) {
     }
 
     if (audioEl.paused) {
-      audioEl.play().catch(() => {});
+      audioEl.play().catch(() => { });
       setPlayingUI(true);
       currentPlayer = { audioEl, resetUI };
     } else {
@@ -245,7 +245,7 @@ function initPlayer(playerEl) {
     const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     audioEl.currentTime = ratio * audioEl.duration;
     if (audioEl.paused) {
-      audioEl.play().catch(() => {});
+      audioEl.play().catch(() => { });
       setPlayingUI(true);
       currentPlayer = { audioEl, resetUI };
     }
@@ -284,8 +284,8 @@ document.querySelectorAll('.char-card').forEach(card => {
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 if (prefersReducedMotion.matches) {
   document.querySelectorAll('.char-card').forEach(card => {
-    card.addEventListener('mousemove', () => {});
-    card.addEventListener('mouseleave', () => {});
+    card.addEventListener('mousemove', () => { });
+    card.addEventListener('mouseleave', () => { });
   });
 }
 
