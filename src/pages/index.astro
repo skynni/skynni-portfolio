@@ -1,0 +1,256 @@
+---
+// index.astro — główna strona portfolio
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import CharCard from '../components/CharCard.astro';
+import MusicTrack from '../components/MusicTrack.astro';
+import LektorCard from '../components/LektorCard.astro';
+
+import { characters } from '../data/characters';
+import { tracks } from '../data/tracks';
+import { lektorCards } from '../data/lektorCards';
+import { socials } from '../data/socials';
+---
+
+<Layout>
+  <!-- HERO -->
+  <Hero />
+
+  <!-- DUBBING -->
+  <section class="section dubbing" id="dubbing" aria-labelledby="dubbing-heading">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__tag">01</span>
+        <h2 class="section__title" id="dubbing-heading">Dubbing</h2>
+        <p class="section__subtitle">
+          Postacie, którym użyczyłem głosu - zarówno w projektach
+          <strong>fandubbingowych</strong>, jak i w <strong>oficjalnym dubbingu</strong>.
+        </p>
+      </div>
+
+      <div class="characters-grid" id="characters-grid" role="list">
+        {characters.map((char) => <CharCard char={char} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- MUZYKA -->
+  <section class="section muzyka" id="muzyka" aria-labelledby="muzyka-heading">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__tag">02</span>
+        <h2 class="section__title" id="muzyka-heading">Działalność muzyczna</h2>
+        <p class="section__subtitle">Śpiewać każdy może, trochę lepiej lub trochę gorzej ~</p>
+      </div>
+
+      <div class="music-list" id="music-list" role="list">
+        {tracks.map((track) => <MusicTrack track={track} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- LEKTORSTWO -->
+  <section class="section lektorstwo" id="lektorstwo" aria-labelledby="lektorstwo-heading">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__tag">03</span>
+        <h2 class="section__title" id="lektorstwo-heading">Lektorstwo</h2>
+        <p class="section__subtitle">
+          Profesjonalne nagrania lektorskie - reklamy, e-learning, rozrywka i media.
+        </p>
+      </div>
+
+      <div class="lektor-grid" id="lektor-grid" role="list">
+        {lektorCards.map((card) => <LektorCard card={card} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTAKT -->
+  <section class="section kontakt" id="kontakt" aria-labelledby="kontakt-heading">
+    <div class="container kontakt__inner">
+      <div class="section__header section__header--centered">
+        <span class="section__tag">04</span>
+        <h2 class="section__title" id="kontakt-heading">Kontakt</h2>
+        <p class="section__subtitle">Nowy projekt? Zawsze chętny!</p>
+      </div>
+      <div class="kontakt__body">
+        <div class="kontakt__socials" role="list" aria-label="Media społecznościowe">
+          {
+            socials.map((social) => (
+              <a
+                href={social.href}
+                target="_blank"
+                class="social-pill"
+                id={social.id}
+                role="listitem"
+                aria-label={social.label}
+                set:html={social.icon + social.label}
+              />
+            ))
+          }
+        </div>
+
+        <div class="kontakt__email-block">
+          <a
+            href="mailto:skynni.poczta@gmail.com"
+            class="social-pill social-pill--email"
+            id="social-email"
+            role="link"
+            aria-label="Wyślij email"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email
+          </a>
+          <p class="kontakt__email-address">skynni.poczta@gmail.com</p>
+        </div>
+
+        <p class="kontakt__note">© 2026 Damian "skynni" Pająk. Wszelkie prawa zastrzeżone.</p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // ── AUDIO PLAYER ENGINE ───────────────────────────────────────────────────────
+  // Global state: tylko jeden odtwarzacz aktywny na raz
+  interface PlayerState {
+    audioEl: HTMLAudioElement;
+    resetUI: () => void;
+  }
+
+  let currentPlayer: PlayerState | null = null;
+
+  function formatTime(secs: number): string {
+    if (!isFinite(secs) || isNaN(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function initPlayer(playerEl: HTMLElement) {
+    const audioId = playerEl.dataset.audio;
+    if (!audioId) return;
+    const audioEl = document.getElementById(audioId) as HTMLAudioElement | null;
+    if (!audioEl) return;
+
+    const btn = playerEl.querySelector<HTMLButtonElement>('.player__btn');
+    const track = playerEl.querySelector<HTMLElement>('.player__track');
+    const progress = playerEl.querySelector<HTMLElement>('.player__progress');
+    const timeEl = playerEl.querySelector<HTMLElement>('.player__time');
+    const iconPlay = playerEl.querySelector<SVGElement>('.icon-play');
+    const iconPause = playerEl.querySelector<SVGElement>('.icon-pause');
+
+    if (!btn || !track || !progress || !timeEl || !iconPlay || !iconPause) return;
+
+    function setPlayingUI(playing: boolean) {
+      iconPlay!.classList.toggle('hidden', playing);
+      iconPause!.classList.toggle('hidden', !playing);
+      btn!.setAttribute('aria-pressed', String(playing));
+    }
+
+    function resetUI() {
+      setPlayingUI(false);
+      progress!.style.width = '0%';
+      timeEl!.textContent = '0:00';
+      track!.setAttribute('aria-valuenow', '0');
+    }
+
+    // Play/pause
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      if (currentPlayer && currentPlayer.audioEl !== audioEl) {
+        currentPlayer.audioEl.pause();
+        currentPlayer.resetUI();
+        currentPlayer = null;
+      }
+
+      if (audioEl.paused) {
+        audioEl.play().catch(() => {});
+        setPlayingUI(true);
+        currentPlayer = { audioEl, resetUI };
+      } else {
+        audioEl.pause();
+        setPlayingUI(false);
+        currentPlayer = null;
+      }
+    });
+
+    // Progress bar update
+    audioEl.addEventListener('timeupdate', () => {
+      if (!audioEl.duration) return;
+      const pct = (audioEl.currentTime / audioEl.duration) * 100;
+      progress.style.width = pct + '%';
+      timeEl.textContent = formatTime(audioEl.currentTime);
+      track.setAttribute('aria-valuenow', String(Math.round(pct)));
+    });
+
+    // Load duration
+    audioEl.addEventListener('loadedmetadata', () => {
+      timeEl.textContent = formatTime(audioEl.duration);
+    });
+
+    // Ended
+    audioEl.addEventListener('ended', () => {
+      resetUI();
+      currentPlayer = null;
+    });
+
+    // Seek on track click
+    track.addEventListener('click', (e) => {
+      if (!audioEl.duration) return;
+      const rect = track.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      audioEl.currentTime = ratio * audioEl.duration;
+      if (audioEl.paused) {
+        audioEl.play().catch(() => {});
+        setPlayingUI(true);
+        currentPlayer = { audioEl, resetUI };
+      }
+    });
+  }
+
+  // Inicjalizuj wszystkie playery
+  document.querySelectorAll<HTMLElement>('.player').forEach(initPlayer);
+
+  // ── SCROLL REVEAL ─────────────────────────────────────────────────────────────
+  const revealEls = document.querySelectorAll<HTMLElement>(
+    '.section__header, .char-card, .music-track, .lektor-card, .kontakt__body'
+  );
+
+  revealEls.forEach((el) => el.classList.add('reveal'));
+
+  const charGrid = document.getElementById('characters-grid');
+  const musicList = document.getElementById('music-list');
+  const lektorGrid = document.getElementById('lektor-grid');
+
+  [charGrid, musicList, lektorGrid].forEach((grid) => {
+    if (grid) grid.classList.add('reveal-stagger');
+  });
+
+  charGrid?.querySelectorAll<HTMLElement>('.char-card').forEach((el) => el.classList.remove('reveal'));
+  musicList?.querySelectorAll<HTMLElement>('.music-track').forEach((el) => el.classList.remove('reveal'));
+  lektorGrid?.querySelectorAll<HTMLElement>('.lektor-card').forEach((el) => el.classList.remove('reveal'));
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+  );
+
+  document.querySelectorAll('.reveal, .reveal-stagger').forEach((el) => {
+    revealObserver.observe(el);
+  });
+
+  console.log('%cskynni portfolio | Cześć! 👋', 'font-size:14px;font-family:monospace;color:#1a1a1a');
+</script>

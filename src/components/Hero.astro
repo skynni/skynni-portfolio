@@ -1,0 +1,39 @@
+---
+// Hero.astro — sekcja hero
+---
+
+<header class="hero" id="hero" role="banner">
+  <div class="hero__bg-grid" aria-hidden="true"></div>
+  <div class="hero__noise" aria-hidden="true"></div>
+  <div class="hero__content">
+    <div class="hero__eyebrow" role="list" aria-label="Role artystyczne">
+      <span role="listitem">Artysta głosowy</span>
+      <span class="hero__eyebrow-sep" aria-hidden="true">·</span>
+      <span role="listitem">Wokalista</span>
+      <span class="hero__eyebrow-sep" aria-hidden="true">·</span>
+      <span role="listitem">Lektor</span>
+    </div>
+    <h1 class="hero__name">
+      Damian<br />
+      <em class="hero__alias">"skynni"</em><br />
+      Pająk
+    </h1>
+    <p class="hero__tagline">Głos którego szukasz!</p>
+    <!-- Opis semantyczny dla robotów i modeli AI - niewidoczny wizualnie -->
+    <p class="sr-only">
+      Damian Pająk, znany w sieci jako skynni, to polski aktor głosowy, lektor i wokalista.
+      Użyczał głosu postaciom w projektach fandubbingowych i oficjalnych produkcjach dubbingowych.
+      Świadczy profesjonalne usługi lektorskie w zakresie reklam, szkoleń e-learningowych
+      oraz audycji radiowych. Jego twórczość muzyczna obejmuje polskie covery piosenek
+      z musicali animowanych. Skontaktuj się, jeśli szukasz aktora głosowego lub lektora.
+    </p>
+    <div class="hero__actions">
+      <a href="#dubbing" class="btn btn--primary" id="hero-cta-dubbing">Poznaj moje role</a>
+      <a href="#kontakt" class="btn btn--ghost" id="hero-cta-contact">Napisz do mnie</a>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">
+    <span>scroll</span>
+    <div class="hero__scroll-line"></div>
+  </div>
+</header>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <url>
+    <loc>https://skynni.pl/</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://skynni.pl/" />
+    
+    <!-- Główne zdjęcie OG -->
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/og-cover.png</image:loc>
+      <image:caption>Damian skynni Pająk – Portfolio Głosowe</image:caption>
+      <image:title>Damian „skynni" Pająk – Aktor Głosowy, Lektor &amp; Wokalista</image:title>
+    </image:image>
+
+    <!-- Postać z Dubbingu -->
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/gojo.png</image:loc>
+      <image:caption>Gojo Satoru – Jujutsu Kaisen (fandubbing PL)</image:caption>
+      <image:title>Gojo Satoru Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
+    
+    <!-- (Możesz tu dodać kolejne tagi <image:image> dla innych postaci z portfolio, jeśli chcesz je mocno pozycjonować w obrazkach) -->
+  </url>
+</urlset>

@@ -1,0 +1,72 @@
+---
+// CharCard.astro — karta postaci dubbingowej
+import AudioPlayer from './AudioPlayer.astro';
+import type { Character } from '../data/characters';
+
+interface Props {
+  char: Character;
+}
+
+const { char } = Astro.props;
+const badgeClass = char.badge === 'fan' ? 'char-card__badge--fan' : 'char-card__badge--official';
+---
+
+<article
+  class="char-card"
+  id={char.id}
+  role="listitem"
+  tabindex="0"
+  aria-label={`${char.name} - ${char.source}`}
+>
+  <div class="char-card__image-wrap">
+    <img
+      src={char.imageSrc}
+      alt={`${char.name} z ${char.source}`}
+      class="char-card__image"
+      loading="lazy"
+    />
+  </div>
+  <div class="char-card__info">
+    <h3 class="char-card__name">{char.name}</h3>
+    <p class="char-card__source">{char.source}</p>
+    <span class={`char-card__badge ${badgeClass}`}>{char.badgeLabel}</span>
+    <div class="char-card__player">
+      <AudioPlayer
+        audioId={char.audioId}
+        audioSrc={char.audioSrc}
+        playBtnId={`play-${char.id.replace('char-', '')}`}
+        playBtnLabel={`Odtwórz próbkę ${char.name}`}
+        regionLabel={`Odtwarzacz audio - ${char.name}`}
+      />
+    </div>
+  </div>
+</article>
+
+<script>
+  // 3D tilt effect + keyboard support — inicjalizacja dla KAŻDEGO char-card
+  document.querySelectorAll<HTMLElement>('.char-card').forEach((card) => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!prefersReducedMotion.matches) {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+        card.style.transform = `translateY(-6px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
+      });
+    }
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+
+    // Keyboard: Enter/Space uruchamia play
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const btn = card.querySelector<HTMLButtonElement>('.player__btn');
+        btn?.click();
+      }
+    });
+  });
+</script>
