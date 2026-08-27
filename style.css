@@ -380,6 +380,7 @@ ol {
   /* pointer-events: none żeby nie blokował kliknięć w treść */
   pointer-events: none;
   animation: fadeUp 1s 0.8s var(--ease-out) both;
+
   /* Ukryj gdy ekran jest za niski — zakryłby treść */
   @media (max-height: 560px) {
     display: none;
@@ -402,6 +403,7 @@ ol {
 }
 
 @keyframes scrollLine {
+
   0%,
   100% {
     transform: scaleY(1);
@@ -526,6 +528,8 @@ ol {
   transition: transform var(--dur-med) var(--ease-out);
   cursor: default;
   outline: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .char-card:hover,
@@ -568,6 +572,7 @@ ol {
   padding: var(--space-md);
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--dur-med), border-color var(--dur-med);
+  flex: 1;
 }
 
 .char-card:hover .char-card__info {
@@ -980,7 +985,7 @@ ol {
 }
 
 /* Stagger children — każde dziecko ma własną klasę reveal */
-.reveal-stagger > * {
+.reveal-stagger>* {
   opacity: 0;
   transform: translateY(20px);
   transition:
@@ -989,16 +994,65 @@ ol {
   will-change: opacity, transform;
 }
 
-.reveal-stagger.visible > *:nth-child(1)  { transition-delay:   0ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(2)  { transition-delay:  70ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(3)  { transition-delay: 140ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(4)  { transition-delay: 210ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(5)  { transition-delay: 280ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(6)  { transition-delay: 350ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(7)  { transition-delay: 420ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(8)  { transition-delay: 490ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(9)  { transition-delay: 560ms; opacity: 1; transform: none; }
-.reveal-stagger.visible > *:nth-child(10) { transition-delay: 630ms; opacity: 1; transform: none; }
+.reveal-stagger.visible>*:nth-child(1) {
+  transition-delay: 0ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(2) {
+  transition-delay: 70ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(3) {
+  transition-delay: 140ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(4) {
+  transition-delay: 210ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(5) {
+  transition-delay: 280ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(6) {
+  transition-delay: 350ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(7) {
+  transition-delay: 420ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(8) {
+  transition-delay: 490ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(9) {
+  transition-delay: 560ms;
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-stagger.visible>*:nth-child(10) {
+  transition-delay: 630ms;
+  opacity: 1;
+  transform: none;
+}
 
 /* ===========================
    RESPONSIVE
