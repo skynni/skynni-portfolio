@@ -197,23 +197,22 @@
 
       <div class="characters-grid" id="characters-grid" role="list">
 
-        <!-- Gojo Satoru -->
-        <article class="char-card" id="char-gojo" role="listitem" tabindex="0"
-          aria-label="Gojo Satoru - Jujutsu Kaisen">
+        <!-- Nedward – UKRYTA (brak nagrania). Aby przywrócić, usuń tagi komentarza HTML wokół article.
+        <article class="char-card" id="char-nedward" role="listitem" tabindex="0" aria-label="Nedward - Office Place">
           <div class="char-card__image-wrap">
-            <img src="assets/images/characters/gojo.png" alt="Gojo Satoru z Jujutsu Kaisen" class="char-card__image"
+            <img src="assets/images/characters/nedward.png" alt="Nedward z Office Place" class="char-card__image"
               loading="lazy" />
           </div>
           <div class="char-card__info">
-            <h3 class="char-card__name">Gojo Satoru</h3>
-            <p class="char-card__source">Jujutsu Kaisen</p>
-            <span class="char-card__badge char-card__badge--fan">Fandubbing</span>
-            <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Gojo Satoru">
-              <audio id="audio-gojo" preload="none">
-                <source src="assets/audio/dubbing/gojo.mp3" type="audio/mpeg" />
+            <h3 class="char-card__name">Nedward</h3>
+            <p class="char-card__source">Office Place</p>
+            <span class="char-card__badge char-card__badge--official">Oficjalny</span>
+            <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Nedward">
+              <audio id="audio-nedward" preload="none">
+                <source src="assets/audio/nedward.mp3" type="audio/mpeg" />
               </audio>
-              <div class="player" data-audio="audio-gojo">
-                <button class="player__btn" id="play-gojo" aria-label="Odtwórz próbkę Gojo Satoru">
+              <div class="player" data-audio="audio-nedward">
+                <button class="player__btn" id="play-nedward" aria-label="Odtwórz próbkę Nedward">
                   <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
@@ -231,41 +230,7 @@
             </div>
           </div>
         </article>
-
-        <!-- Valentino -->
-        <article class="char-card" id="char-valentino" role="listitem" tabindex="0"
-          aria-label="Valentino - Hazbin Hotel">
-          <div class="char-card__image-wrap">
-            <img src="assets/images/characters/valentino2.png" alt="Valentino z Hazbin Hotel" class="char-card__image"
-              loading="lazy" />
-          </div>
-          <div class="char-card__info">
-            <h3 class="char-card__name">Valentino</h3>
-            <p class="char-card__source">Hazbin Hotel</p>
-            <span class="char-card__badge char-card__badge--fan">Fandubbing</span>
-            <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Valentino">
-              <audio id="audio-valentino" preload="none">
-                <source src="assets/audio/dubbing/valentino.mp3" type="audio/mpeg" />
-              </audio>
-              <div class="player" data-audio="audio-valentino">
-                <button class="player__btn" id="play-valentino" aria-label="Odtwórz próbkę Valentino">
-                  <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="6" y1="4" x2="6" y2="20" />
-                    <line x1="18" y1="4" x2="18" y2="20" />
-                  </svg>
-                </button>
-                <div class="player__track" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
-                  aria-label="Postęp odtwarzania">
-                  <div class="player__progress"></div>
-                </div>
-                <span class="player__time" aria-live="polite">0:00</span>
-              </div>
-            </div>
-          </div>
-        </article>
+        -->
 
         <!-- Norfeusz -->
         <article class="char-card" id="char-norfeusz" role="listitem" tabindex="0"
@@ -277,13 +242,48 @@
           <div class="char-card__info">
             <h3 class="char-card__name">Morpheus</h3>
             <p class="char-card__source">Sunny Side Down</p>
-            <span class="char-card__badge char-card__badge--official">Oficjalny dubbing</span>
+            <span class="char-card__badge char-card__badge--official">Oficjalny</span>
             <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Norfeusz">
               <audio id="audio-norfeusz" preload="none">
                 <source src="assets/audio/dubbing/Morpheus.mp3" type="audio/mpeg" />
               </audio>
               <div class="player" data-audio="audio-norfeusz">
                 <button class="player__btn" id="play-norfeusz" aria-label="Odtwórz próbkę Norfeusz">
+                  <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="6" y1="4" x2="6" y2="20" />
+                    <line x1="18" y1="4" x2="18" y2="20" />
+                  </svg>
+                </button>
+                <div class="player__track" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                  aria-label="Postęp odtwarzania">
+                  <div class="player__progress"></div>
+                </div>
+                <span class="player__time" aria-live="polite">0:00</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Gojo Satoru -->
+        <article class="char-card" id="char-gojo" role="listitem" tabindex="0"
+          aria-label="Gojo Satoru - Jujutsu Kaisen">
+          <div class="char-card__image-wrap">
+            <img src="assets/images/characters/gojo.png" alt="Gojo Satoru z Jujutsu Kaisen" class="char-card__image"
+              loading="lazy" />
+          </div>
+          <div class="char-card__info">
+            <h3 class="char-card__name">Gojo Satoru</h3>
+            <p class="char-card__source">Jujutsu Kaisen</p>
+            <span class="char-card__badge char-card__badge--fan">Fanowski</span>
+            <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Gojo Satoru">
+              <audio id="audio-gojo" preload="none">
+                <source src="assets/audio/dubbing/gojo.mp3" type="audio/mpeg" />
+              </audio>
+              <div class="player" data-audio="audio-gojo">
+                <button class="player__btn" id="play-gojo" aria-label="Odtwórz próbkę Gojo Satoru">
                   <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
@@ -312,13 +312,48 @@
           <div class="char-card__info">
             <h3 class="char-card__name">Morrison</h3>
             <p class="char-card__source">Devil May Cry</p>
-            <span class="char-card__badge char-card__badge--fan">Fandubbing</span>
+            <span class="char-card__badge char-card__badge--fan">Fanowski</span>
             <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Morrison">
               <audio id="audio-morrison" preload="none">
                 <source src="assets/audio/dubbing/morrison.mp3" type="audio/mpeg" />
               </audio>
               <div class="player" data-audio="audio-morrison">
                 <button class="player__btn" id="play-morrison" aria-label="Odtwórz próbkę Morrison">
+                  <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="6" y1="4" x2="6" y2="20" />
+                    <line x1="18" y1="4" x2="18" y2="20" />
+                  </svg>
+                </button>
+                <div class="player__track" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                  aria-label="Postęp odtwarzania">
+                  <div class="player__progress"></div>
+                </div>
+                <span class="player__time" aria-live="polite">0:00</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Valentino -->
+        <article class="char-card" id="char-valentino" role="listitem" tabindex="0"
+          aria-label="Valentino - Hazbin Hotel">
+          <div class="char-card__image-wrap">
+            <img src="assets/images/characters/valentino2.png" alt="Valentino z Hazbin Hotel" class="char-card__image"
+              loading="lazy" />
+          </div>
+          <div class="char-card__info">
+            <h3 class="char-card__name">Valentino</h3>
+            <p class="char-card__source">Hazbin Hotel</p>
+            <span class="char-card__badge char-card__badge--fan">Fanowski</span>
+            <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Valentino">
+              <audio id="audio-valentino" preload="none">
+                <source src="assets/audio/dubbing/valentino.mp3" type="audio/mpeg" />
+              </audio>
+              <div class="player" data-audio="audio-valentino">
+                <button class="player__btn" id="play-valentino" aria-label="Odtwórz próbkę Valentino">
                   <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
@@ -346,7 +381,7 @@
           <div class="char-card__info">
             <h3 class="char-card__name">Mordecai</h3>
             <p class="char-card__source">Lackadaisy</p>
-            <span class="char-card__badge char-card__badge--fan">Fandubbing</span>
+            <span class="char-card__badge char-card__badge--fan">Fanowski</span>
             <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Mordecai">
               <audio id="audio-mordecai" preload="none">
                 <source src="assets/audio/dubbing/mordecai.mp3" type="audio/mpeg" />
@@ -380,47 +415,13 @@
           <div class="char-card__info">
             <h3 class="char-card__name">Tails</h3>
             <p class="char-card__source">Sonic the Hedgehog</p>
-            <span class="char-card__badge char-card__badge--fan">Fandubbing</span>
+            <span class="char-card__badge char-card__badge--fan">Fanowski</span>
             <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Tails">
               <audio id="audio-tails" preload="none">
                 <source src="assets/audio/dubbing/tails.mp3" type="audio/mpeg" />
               </audio>
               <div class="player" data-audio="audio-tails">
                 <button class="player__btn" id="play-tails" aria-label="Odtwórz próbkę Tails">
-                  <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="6" y1="4" x2="6" y2="20" />
-                    <line x1="18" y1="4" x2="18" y2="20" />
-                  </svg>
-                </button>
-                <div class="player__track" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
-                  aria-label="Postęp odtwarzania">
-                  <div class="player__progress"></div>
-                </div>
-                <span class="player__time" aria-live="polite">0:00</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Nedward -->
-        <article class="char-card" id="char-nedward" role="listitem" tabindex="0" aria-label="Nedward - Office Place">
-          <div class="char-card__image-wrap">
-            <img src="assets/images/characters/nedward.png" alt="Nedward z Office Place" class="char-card__image"
-              loading="lazy" />
-          </div>
-          <div class="char-card__info">
-            <h3 class="char-card__name">Nedward</h3>
-            <p class="char-card__source">Office Place</p>
-            <span class="char-card__badge char-card__badge--official">Oficjalny dubbing</span>
-            <div class="char-card__player" role="region" aria-label="Odtwarzacz audio - Nedward">
-              <audio id="audio-nedward" preload="none">
-                <source src="assets/audio/nedward.mp3" type="audio/mpeg" />
-              </audio>
-              <div class="player" data-audio="audio-nedward">
-                <button class="player__btn" id="play-nedward" aria-label="Odtwórz próbkę Nedward">
                   <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
