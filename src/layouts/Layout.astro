@@ -1,0 +1,154 @@
+---
+// Layout.astro — główny layout z pełnym <head> SEO, OG, JSON-LD, fontami
+import Navbar from '../components/Navbar.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Damian "skynni" Pająk - Aktor Głosowy, Lektor & Wokalista | Portfolio',
+  description = 'Damian Pająk, znany jako skynni - polski aktor głosowy, lektor i wokalista. Dubbing (fandubbing i oficjalny), lektorstwo reklamowe, e-learning oraz muzyczne covery. Sprawdź portfolio i skontaktuj się.',
+} = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': 'https://skynni.pl/#person',
+      name: 'Damian Pająk',
+      alternateName: ['skynni', 'skyynni', 'skaynni'],
+      description:
+        'Damian Pająk (znany jako skynni) - polski aktor głosowy, lektor i wokalista specjalizujący się w dubbingu, fandubbing oraz nagraniach lektorskich dla reklam, e-learningu i mediów.',
+      url: 'https://skynni.pl/',
+      email: 'skynni.poczta@gmail.com',
+      jobTitle: ['Aktor głosowy', 'Lektor', 'Wokalista'],
+      knowsLanguage: ['pl'],
+      nationality: { '@type': 'Country', name: 'Poland' },
+      sameAs: [
+        'https://youtube.com/@skyynni',
+        'https://www.tiktok.com/@skaynni',
+        'https://www.facebook.com/skyynni',
+        'https://open.spotify.com/artist/2RNgnvqKJGvdbYMYWCZnw7',
+        'https://www.fiverr.com/s/vvNNPzq',
+        'https://dubbingpedia.pl/wiki/Damian_Pająk',
+      ],
+    },
+    {
+      '@type': 'ProfilePage',
+      '@id': 'https://skynni.pl/#webpage',
+      url: 'https://skynni.pl/',
+      name: 'Damian skynni Pająk - Aktor Głosowy, Lektor & Wokalista | Portfolio',
+      description: 'Oficjalne portfolio głosowe Damiana Pająka (skynni) - próbki dubbingu, lektorstwa i muzyki.',
+      inLanguage: 'pl',
+      isPartOf: {
+        '@type': 'WebSite',
+        '@id': 'https://skynni.pl/#website',
+        url: 'https://skynni.pl/',
+        name: 'skynni.pl',
+      },
+      about: { '@id': 'https://skynni.pl/#person' },
+      mainEntity: { '@id': 'https://skynni.pl/#person' },
+    },
+    {
+      '@type': 'ItemList',
+      '@id': 'https://skynni.pl/#dubbing-roles',
+      name: 'Role dubbingowe - Damian Pająk (skynni)',
+      description: 'Lista ról dubbingowych i fandubbingowych użyczonych przez Damiana Pająka.',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Gojo Satoru - Jujutsu Kaisen (fandubbing)' },
+        { '@type': 'ListItem', position: 2, name: 'Valentino - Hazbin Hotel (fandubbing)' },
+        { '@type': 'ListItem', position: 3, name: 'Morpheus - Sunny Side Down (oficjalny dubbing)' },
+        { '@type': 'ListItem', position: 4, name: 'Morrison - Devil May Cry (fandubbing)' },
+        { '@type': 'ListItem', position: 5, name: 'Mordecai - Lackadaisy (fandubbing)' },
+        { '@type': 'ListItem', position: 6, name: 'Tails - Sonic the Hedgehog (fandubbing)' },
+        { '@type': 'ListItem', position: 7, name: 'Nedward - Office Place (oficjalny dubbing)' },
+      ],
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ═══════════════════════════════════════════════
+         FAVICON
+    ═══════════════════════════════════════════════ -->
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+    <meta name="theme-color" content="#f7f6f3" />
+
+    <!-- ═══════════════════════════════════════════════
+         PODSTAWOWE SEO
+    ═══════════════════════════════════════════════ -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="skynni, Damian Pająk, aktor głosowy, dubbing, fandubbing, lektor, lektorstwo, wokalista, polski dubbing, voice actor, portfolio głosowe"
+    />
+    <meta name="author" content="Damian Pająk" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://skynni.pl/" />
+
+    <!-- ═══════════════════════════════════════════════
+         OPEN GRAPH (Facebook, Discord, Messenger, LinkedIn)
+    ═══════════════════════════════════════════════ -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:url" content="https://skynni.pl/" />
+    <meta property="og:site_name" content="skynni - Portfolio Głosowe" />
+    <meta property="og:title" content="Damian skynni Pająk - Aktor Głosowy & Lektor" />
+    <meta
+      property="og:description"
+      content="Polski aktor głosowy, lektor i wokalista. Fandubbing, oficjalny dubbing, nagrania lektorskie. Posłuchaj próbek i nawiąż współpracę."
+    />
+    <meta property="og:image" content="https://skynni.pl/assets/images/og-cover.png?v=2" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Damian skynni Pająk - Portfolio Głosowe" />
+    <meta property="profile:first_name" content="Damian" />
+    <meta property="profile:last_name" content="Pająk" />
+    <meta property="profile:username" content="skynni" />
+
+    <!-- ═══════════════════════════════════════════════
+         TWITTER / X CARD
+    ═══════════════════════════════════════════════ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Damian skynni Pająk - Aktor Głosowy & Lektor" />
+    <meta
+      name="twitter:description"
+      content="Polski aktor głosowy, lektor i wokalista. Fandubbing, oficjalny dubbing, nagrania lektorskie. Posłuchaj próbek i nawiąż współpracę."
+    />
+    <meta name="twitter:image" content="https://skynni.pl/assets/images/og-cover.png" />
+    <meta name="twitter:image:alt" content="Damian skynni Pająk - Portfolio Głosowe" />
+
+    <!-- ═══════════════════════════════════════════════
+         SCHEMA.ORG - JSON-LD (Entity / Knowledge Graph)
+    ═══════════════════════════════════════════════ -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- ═══════════════════════════════════════════════
+         FONTY
+    ═══════════════════════════════════════════════ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <Navbar />
+    <slot />
+  </body>
+</html>

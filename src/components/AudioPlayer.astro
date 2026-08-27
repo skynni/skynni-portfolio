@@ -1,0 +1,59 @@
+---
+// AudioPlayer.astro — reużywalny odtwarzacz audio
+// Props:
+//   audioId  — unikalny id elementu <audio>
+//   audioSrc — ścieżka do pliku audio
+//   audioType — MIME type (domyślnie audio/mpeg)
+//   playBtnId — id przycisku play
+//   playBtnLabel — aria-label przycisku play
+//   playerClass — dodatkowe klasy CSS (.player--inline, .player--lektor)
+//   regionLabel — aria-label dla region
+
+interface Props {
+  audioId: string;
+  audioSrc: string;
+  audioType?: string;
+  playBtnId: string;
+  playBtnLabel: string;
+  playerClass?: string;
+  regionLabel: string;
+}
+
+const {
+  audioId,
+  audioSrc,
+  audioType = 'audio/mpeg',
+  playBtnId,
+  playBtnLabel,
+  playerClass = '',
+  regionLabel,
+} = Astro.props;
+---
+
+<div role="region" aria-label={regionLabel}>
+  <audio id={audioId} preload="none">
+    <source src={audioSrc} type={audioType} />
+  </audio>
+  <div class={`player ${playerClass}`} data-audio={audioId}>
+    <button class="player__btn" id={playBtnId} aria-label={playBtnLabel}>
+      <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="5 3 19 12 5 21 5 3" />
+      </svg>
+      <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="6" y1="4" x2="6" y2="20" />
+        <line x1="18" y1="4" x2="18" y2="20" />
+      </svg>
+    </button>
+    <div
+      class="player__track"
+      role="slider"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      aria-label="Postęp odtwarzania"
+    >
+      <div class="player__progress"></div>
+    </div>
+    <span class="player__time" aria-live="polite">0:00</span>
+  </div>
+</div>

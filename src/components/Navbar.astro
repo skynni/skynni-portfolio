@@ -1,0 +1,118 @@
+---
+// Navbar.astro — stała nawigacja z hamburgerem
+---
+
+<nav class="nav" id="main-nav" aria-label="Nawigacja główna">
+  <a href="#hero" class="nav__logo" id="nav-logo" aria-label="Wróć na górę strony">
+    <span class="nav__logo-name">skynni</span>
+    <span class="nav__logo-dot">.</span>
+  </a>
+  <ul class="nav__links" role="list">
+    <li><a href="#dubbing" class="nav__link" id="nav-dubbing">Dubbing</a></li>
+    <li><a href="#muzyka" class="nav__link" id="nav-muzyka">Muzyka</a></li>
+    <li><a href="#lektorstwo" class="nav__link" id="nav-lektorstwo">Lektorstwo</a></li>
+    <li>
+      <a href="#kontakt" class="nav__link nav__link--cta" id="nav-kontakt">Kontakt</a>
+    </li>
+  </ul>
+  <button class="nav__hamburger" id="hamburger-btn" aria-label="Otwórz menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<script>
+  // ── NAV: scroll state & active link ──────────────────────────────────────────
+  const nav = document.getElementById('main-nav')!;
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.nav__link:not(.nav__link--cta)');
+  const sections = document.querySelectorAll<HTMLElement>('section[id], header[id]');
+
+  function updateNav() {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+
+    let currentId = '';
+    sections.forEach((section) => {
+      const top = section.getBoundingClientRect().top;
+      if (top <= 120) currentId = section.id;
+    });
+
+    navLinks.forEach((link) => {
+      const href = link.getAttribute('href')?.slice(1);
+      link.classList.toggle('active', href === currentId);
+    });
+  }
+
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+
+  // ── NAV: hamburger mobile ─────────────────────────────────────────────────────
+  const hamburger = document.getElementById('hamburger-btn')!;
+  const navLinksList = document.querySelector<HTMLElement>('.nav__links')!;
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = hamburger.classList.toggle('open');
+    navLinksList.classList.toggle('open', isOpen);
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  // ── SMOOTH SCROLL ─────────────────────────────────────────────────────────────
+  const NAV_HEIGHT = 72;
+
+  function easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  let scrollRafId: number | null = null;
+
+  function smoothScrollTo(targetY: number, duration = 700) {
+    if (scrollRafId !== null) {
+      cancelAnimationFrame(scrollRafId);
+      scrollRafId = null;
+    }
+
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+
+    if (Math.abs(distance) < 1) return;
+
+    const startTime = performance.now();
+
+    function step(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      window.scrollTo(0, startY + distance * easeInOutCubic(progress));
+      if (progress < 1) {
+        scrollRafId = requestAnimationFrame(step);
+      } else {
+        scrollRafId = null;
+      }
+    }
+
+    scrollRafId = requestAnimationFrame(step);
+  }
+
+  document.addEventListener('click', (e) => {
+    const link = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!link) return;
+
+    const targetId = link.getAttribute('href')!.slice(1);
+    if (!targetId) return;
+
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    e.preventDefault();
+
+    // Zamknij mobile nav
+    hamburger.classList.remove('open');
+    navLinksList.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+
+    const SECTION_EXTRA_OFFSET: Record<string, number> = { dubbing: 100 };
+    const extraOffset = SECTION_EXTRA_OFFSET[targetId] ?? 0;
+
+    const targetY = target.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT + extraOffset;
+    smoothScrollTo(Math.max(0, targetY));
+
+    history.pushState(null, '', `#${targetId}`);
+  });
+</script>

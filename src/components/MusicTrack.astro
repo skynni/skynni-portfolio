@@ -1,0 +1,29 @@
+---
+// MusicTrack.astro — wiersz listy muzycznej
+import AudioPlayer from './AudioPlayer.astro';
+import type { Track } from '../data/tracks';
+
+interface Props {
+  track: Track;
+}
+
+const { track } = Astro.props;
+---
+
+<article class="music-track" id={track.id} role="listitem">
+  <div class="music-track__num" aria-hidden="true">{track.num}</div>
+  <div class="music-track__info">
+    <h3 class="music-track__title">{track.title}</h3>
+    <p class="music-track__genre">{track.genre}</p>
+  </div>
+  <div class="music-track__player">
+    <AudioPlayer
+      audioId={track.audioId}
+      audioSrc={track.audioSrc}
+      playBtnId={`play-${track.audioId.replace('audio-', '')}`}
+      playBtnLabel={`Odtwórz utwór: ${track.title}`}
+      playerClass="player--inline"
+      regionLabel={`Odtwarzacz - ${track.title}`}
+    />
+  </div>
+</article>
