@@ -1,0 +1,448 @@
+---
+// CharModal.astro — pełnoekranowy panel szczegółów postaci
+import type { Character } from '../data/characters';
+
+interface Props {
+  characters: Character[];
+}
+
+const { characters } = Astro.props;
+---
+
+<!-- Dane postaci dla skryptu modalu -->
+<script define:vars={{ __chars: characters }}>
+  window.__CHARS_DATA__ = __chars;
+</script>
+
+<div
+  class="char-modal-overlay"
+  id="char-modal-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="char-modal-name"
+  hidden
+>
+  <div class="char-modal" id="char-modal" role="document">
+
+    <!-- Przycisk zamknięcia -->
+    <button
+      class="char-modal__close"
+      id="char-modal-close"
+      aria-label="Zamknij panel"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="char-modal__layout">
+
+      <!-- LEWA: obraz postaci -->
+      <div class="char-modal__image-wrap">
+        <img
+          id="char-modal-image"
+          class="char-modal__image"
+          src=""
+          alt=""
+          loading="lazy"
+        />
+      </div>
+
+      <!-- PRAWA: treść -->
+      <div class="char-modal__content">
+
+        <!-- Nagłówek -->
+        <div class="char-modal__header">
+          <span id="char-modal-badge" class="char-card__badge"></span>
+          <h2 id="char-modal-name" class="char-modal__name"></h2>
+          <p id="char-modal-source" class="char-modal__source"></p>
+        </div>
+
+        <div class="char-modal__divider" aria-hidden="true"></div>
+
+        <!-- Audio player -->
+        <div class="char-modal__section">
+          <p class="char-modal__section-label">Próbka głosu</p>
+          <div class="player char-modal__player" id="char-modal-player">
+            <button
+              class="player__btn"
+              id="char-modal-play-btn"
+              aria-pressed="false"
+              aria-label="Odtwórz / Zatrzymaj"
+            >
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+              <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16" />
+                <rect x="14" y="4" width="4" height="16" />
+              </svg>
+            </button>
+            <div
+              class="player__track"
+              id="char-modal-track"
+              role="slider"
+              aria-label="Pasek postępu"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            >
+              <div class="player__progress" id="char-modal-progress"></div>
+            </div>
+            <span class="player__time" id="char-modal-time">0:00</span>
+          </div>
+        </div>
+
+        <div class="char-modal__divider" aria-hidden="true"></div>
+
+        <!-- Filmy -->
+        <div class="char-modal__section" id="char-modal-videos-section">
+          <p class="char-modal__section-label">Materiał wideo</p>
+          <div id="char-modal-videos" class="char-modal__videos"></div>
+        </div>
+
+      </div><!-- /.char-modal__content -->
+    </div><!-- /.char-modal__layout -->
+  </div><!-- /.char-modal -->
+</div><!-- /.char-modal-overlay -->
+
+<script>
+  // ── CHAR MODAL ENGINE ─────────────────────────────────────────────────────────
+
+  interface VideoClip {
+    type: 'youtube' | 'tiktok';
+    id: string;
+    label?: string;
+  }
+
+  interface CharData {
+    id: string;
+    name: string;
+    source: string;
+    badge: 'fan' | 'official';
+    badgeLabel: string;
+    imageSrc: string;
+    audioId: string;
+    videos?: VideoClip[];
+  }
+
+  const allChars: CharData[] = (window as any).__CHARS_DATA__ ?? [];
+
+  // ── Elementy DOM ───────────────────────────────────────────────────────────────
+  const overlay    = document.getElementById('char-modal-overlay')!;
+  const modal      = document.getElementById('char-modal')!;
+  const closeBtn   = document.getElementById('char-modal-close') as HTMLButtonElement;
+  const nameEl     = document.getElementById('char-modal-name')!;
+  const sourceEl   = document.getElementById('char-modal-source')!;
+  const badgeEl    = document.getElementById('char-modal-badge')!;
+  const imageEl    = document.getElementById('char-modal-image') as HTMLImageElement;
+  const videosSec  = document.getElementById('char-modal-videos-section')!;
+  const videosCont = document.getElementById('char-modal-videos')!;
+
+  // Elementy playera modalnego
+  const playBtn    = document.getElementById('char-modal-play-btn') as HTMLButtonElement;
+  const trackEl    = document.getElementById('char-modal-track')!;
+  const progressEl = document.getElementById('char-modal-progress')!;
+  const timeEl     = document.getElementById('char-modal-time')!;
+  const iconPlay   = playBtn.querySelector<SVGElement>('.icon-play');
+  const iconPause  = playBtn.querySelector<SVGElement>('.icon-pause');
+
+  let currentAudioEl: HTMLAudioElement | null = null;
+  let audioCleanups: (() => void)[] = [];
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+  function fmt(secs: number): string {
+    if (!isFinite(secs) || isNaN(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function setPlayingUI(playing: boolean) {
+    iconPlay?.classList.toggle('hidden', playing);
+    iconPause?.classList.toggle('hidden', !playing);
+    playBtn.setAttribute('aria-pressed', String(playing));
+  }
+
+  function resetPlayerUI() {
+    setPlayingUI(false);
+    progressEl.style.width = '0%';
+    timeEl.textContent = '0:00';
+    trackEl.setAttribute('aria-valuenow', '0');
+  }
+
+  // ── Audio Player ──────────────────────────────────────────────────────────────
+  function initModalPlayer(audioId: string) {
+    audioCleanups.forEach(fn => fn());
+    audioCleanups = [];
+
+    const audio = document.getElementById(audioId) as HTMLAudioElement | null;
+    if (!audio) return;
+    currentAudioEl = audio;
+
+    if (audio.duration) timeEl.textContent = fmt(audio.duration);
+
+    function onPlay(e: Event) {
+      e.stopPropagation();
+      document.dispatchEvent(new CustomEvent('char-modal-audio-takeover', { detail: { audioId } }));
+      if (audio.paused) {
+        audio.play().catch(() => {});
+        setPlayingUI(true);
+      } else {
+        audio.pause();
+        setPlayingUI(false);
+      }
+    }
+
+    function onTimeUpdate() {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progressEl.style.width = pct + '%';
+      timeEl.textContent = fmt(audio.currentTime);
+      trackEl.setAttribute('aria-valuenow', String(Math.round(pct)));
+    }
+
+    function onLoaded() { timeEl.textContent = fmt(audio.duration); }
+    function onEnded()  { resetPlayerUI(); }
+
+    function onTrackClick(e: MouseEvent) {
+      if (!audio.duration) return;
+      const rect = trackEl.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * audio.duration;
+      if (audio.paused) {
+        audio.play().catch(() => {});
+        setPlayingUI(true);
+      }
+    }
+
+    playBtn.addEventListener('click', onPlay);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('ended', onEnded);
+    trackEl.addEventListener('click', onTrackClick);
+
+    audioCleanups = [
+      () => playBtn.removeEventListener('click', onPlay),
+      () => audio.removeEventListener('timeupdate', onTimeUpdate),
+      () => audio.removeEventListener('loadedmetadata', onLoaded),
+      () => audio.removeEventListener('ended', onEnded),
+      () => trackEl.removeEventListener('click', onTrackClick),
+    ];
+  }
+
+  // ── Video rendering ───────────────────────────────────────────────────────────
+
+  // Tworzy miniaturę YouTube z lazy iframe
+  function makeYouTubeItem(videoId: string, label?: string): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'char-modal__video-item';
+
+    if (label) {
+      const lbl = document.createElement('p');
+      lbl.className = 'char-modal__video-label';
+      lbl.textContent = label;
+      wrap.appendChild(lbl);
+    }
+
+    const thumb = document.createElement('div');
+    thumb.className = 'char-modal__video-thumb';
+    thumb.setAttribute('role', 'button');
+    thumb.setAttribute('tabindex', '0');
+    thumb.setAttribute('aria-label', `Odtwórz film${label ? ': ' + label : ''}`);
+
+    const img = document.createElement('img');
+    img.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    img.alt = `Miniatura${label ? ': ' + label : ''}`;
+    img.loading = 'lazy';
+    img.onerror = () => { img.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; };
+    thumb.appendChild(img);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'char-modal__video-play-btn';
+    overlay.innerHTML = `
+      <div class="char-modal__video-play-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <polygon points="5,3 19,12 5,21"/>
+        </svg>
+      </div>
+    `;
+    thumb.appendChild(overlay);
+
+    function loadIframe() {
+      const iWrap = document.createElement('div');
+      iWrap.className = 'char-modal__iframe-wrap';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iWrap.appendChild(iframe);
+      if (currentAudioEl && !currentAudioEl.paused) {
+        currentAudioEl.pause();
+        resetPlayerUI();
+      }
+      wrap.replaceChild(iWrap, thumb);
+    }
+
+    thumb.addEventListener('click', loadIframe);
+    thumb.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadIframe(); }
+    });
+
+    wrap.appendChild(thumb);
+    return wrap;
+  }
+
+  // Tworzy osadzony TikTok z lazy iframe (tiktok.com/embed/v2/)
+  function makeTikTokItem(videoId: string, label?: string): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'char-modal__video-item';
+
+    if (label) {
+      const lbl = document.createElement('p');
+      lbl.className = 'char-modal__video-label';
+      lbl.textContent = label;
+      wrap.appendChild(lbl);
+    }
+
+    // Placeholder — kliknij aby załadować
+    const placeholder = document.createElement('div');
+    placeholder.className = 'char-modal__tiktok-placeholder';
+    placeholder.setAttribute('role', 'button');
+    placeholder.setAttribute('tabindex', '0');
+    placeholder.setAttribute('aria-label', 'Załaduj wideo TikTok');
+    placeholder.innerHTML = `
+      <div class="char-modal__tiktok-play">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
+          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.53V6.76a4.85 4.85 0 01-1.02-.07z"/>
+        </svg>
+      </div>
+      <p class="char-modal__tiktok-cta">Kliknij, aby załadować wideo TikTok</p>
+    `;
+
+    function loadTikTok() {
+      const iWrap = document.createElement('div');
+      iWrap.className = 'char-modal__iframe-wrap char-modal__iframe-wrap--tiktok';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.tiktok.com/embed/v2/${videoId}`;
+      iframe.allow = 'encrypted-media';
+      iframe.allowFullscreen = true;
+      iWrap.appendChild(iframe);
+      if (currentAudioEl && !currentAudioEl.paused) {
+        currentAudioEl.pause();
+        resetPlayerUI();
+      }
+      wrap.replaceChild(iWrap, placeholder);
+    }
+
+    placeholder.addEventListener('click', loadTikTok);
+    placeholder.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadTikTok(); }
+    });
+
+    wrap.appendChild(placeholder);
+    return wrap;
+  }
+
+  function renderVideos(videos?: VideoClip[]) {
+    videosCont.innerHTML = '';
+    if (!videos || videos.length === 0) {
+      videosSec.style.display = 'none';
+      return;
+    }
+    videosSec.style.display = '';
+    videos.forEach((v) => {
+      if (v.type === 'youtube') {
+        videosCont.appendChild(makeYouTubeItem(v.id, v.label));
+      } else if (v.type === 'tiktok') {
+        videosCont.appendChild(makeTikTokItem(v.id, v.label));
+      }
+    });
+  }
+
+  // ── Open / Close ──────────────────────────────────────────────────────────────
+  let previouslyFocused: HTMLElement | null = null;
+
+  function openModal(charId: string) {
+    const char = allChars.find((c) => c.id === charId);
+    if (!char) return;
+
+    previouslyFocused = document.activeElement as HTMLElement;
+
+    nameEl.textContent = char.name;
+    sourceEl.textContent = char.source;
+    imageEl.src = char.imageSrc;
+    imageEl.alt = `${char.name} z ${char.source}`;
+
+    badgeEl.textContent = char.badgeLabel;
+    badgeEl.className = 'char-card__badge ' +
+      (char.badge === 'fan' ? 'char-card__badge--fan' : 'char-card__badge--official');
+
+    resetPlayerUI();
+    initModalPlayer(char.audioId);
+    renderVideos(char.videos);
+
+    overlay.removeAttribute('hidden');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => overlay.classList.add('open'));
+    });
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => closeBtn.focus(), 320);
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+
+    if (currentAudioEl && !currentAudioEl.paused) {
+      currentAudioEl.pause();
+      resetPlayerUI();
+    }
+
+    // Zatrzymaj filmy — usuń iframy
+    videosCont.querySelectorAll('iframe').forEach((f) => {
+      f.closest('.char-modal__iframe-wrap')?.remove();
+    });
+
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      overlay.setAttribute('hidden', '');
+      previouslyFocused?.focus();
+    }, 320);
+  }
+
+  // ── Zdarzenia ─────────────────────────────────────────────────────────────────
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element).closest('[data-open-char-modal]') as HTMLElement | null;
+    if (btn?.dataset.openCharModal) openModal(btn.dataset.openCharModal);
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  // Focus trap
+  modal.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(
+      modal.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input, [tabindex]:not([tabindex="-1"])'
+      )
+    );
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  });
+
+  // Globalny page player zatrzymuje się gdy modal przejmuje audio
+  document.addEventListener('char-modal-audio-takeover', (e: Event) => {
+    // Sygnał obsługiwany przez index.astro
+  });
+</script>
