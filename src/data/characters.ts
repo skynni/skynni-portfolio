@@ -12,6 +12,16 @@ export interface Character {
 
 export const characters: Character[] = [
   {
+    id: 'char-nedward',
+    name: 'Nedward',
+    source: 'Office Place',
+    badge: 'official',
+    badgeLabel: 'Oficjalny',
+    imageSrc: '/assets/images/characters/nedward.png',
+    audioId: 'audio-nedward',
+    audioSrc: '/assets/audio/dubbing/nedward.mp3',
+  },
+  {
     id: 'char-norfeusz',
     name: 'Morpheus',
     source: 'Sunny Side Down',
