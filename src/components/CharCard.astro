@@ -39,6 +39,16 @@ const badgeClass = char.badge === 'fan' ? 'char-card__badge--fan' : 'char-card__
         regionLabel={`Odtwarzacz audio - ${char.name}`}
       />
     </div>
+    <button
+      class="char-card__more-btn"
+      data-open-char-modal={char.id}
+      aria-label={`Więcej o ${char.name}`}
+    >
+      Więcej
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
   </div>
 </article>
 
@@ -60,9 +70,11 @@ const badgeClass = char.badge === 'fan' ? 'char-card__badge--fan' : 'char-card__
       card.style.transform = '';
     });
 
-    // Keyboard: Enter/Space uruchamia play
+    // Keyboard: Enter/Space uruchamia play (ale nie gdy focus jest na przycisku Więcej)
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('char-card__more-btn')) return;
         e.preventDefault();
         const btn = card.querySelector<HTMLButtonElement>('.player__btn');
         btn?.click();

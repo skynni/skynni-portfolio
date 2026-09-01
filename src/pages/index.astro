@@ -3,6 +3,7 @@
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import CharCard from '../components/CharCard.astro';
+import CharModal from '../components/CharModal.astro';
 import MusicTrack from '../components/MusicTrack.astro';
 import LektorCard from '../components/LektorCard.astro';
 
@@ -33,6 +34,10 @@ import { socials } from '../data/socials';
       </div>
     </div>
   </section>
+
+  <!-- MODAL POSTACI -->
+  <CharModal characters={characters} />
+
 
   <!-- MUZYKA -->
   <section class="section muzyka" id="muzyka" aria-labelledby="muzyka-heading">
@@ -214,8 +219,21 @@ import { socials } from '../data/socials';
     });
   }
 
-  // Inicjalizuj wszystkie playery
-  document.querySelectorAll<HTMLElement>('.player').forEach(initPlayer);
+  // Inicjalizuj wszystkie playery (z wyjątkiem playera modalnego — ma własną logikę)
+  document.querySelectorAll<HTMLElement>('.player').forEach((el) => {
+    if (el.id === 'char-modal-player') return;
+    initPlayer(el);
+  });
+
+  // Gdy modal przejmuje audio — zatrzymaj globalny player
+  document.addEventListener('char-modal-audio-takeover', (e: Event) => {
+    const detail = (e as CustomEvent<{ audioId: string }>).detail;
+    if (currentPlayer && currentPlayer.audioEl.id !== detail.audioId) {
+      currentPlayer.audioEl.pause();
+      currentPlayer.resetUI();
+      currentPlayer = null;
+    }
+  });
 
   // ── SCROLL REVEAL ─────────────────────────────────────────────────────────────
   const revealEls = document.querySelectorAll<HTMLElement>(
