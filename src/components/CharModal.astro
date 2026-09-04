@@ -345,7 +345,7 @@ const { characters } = Astro.props;
     return wrap;
   }
 
-  function renderVideos(videos?: VideoClip[]) {
+  function renderVideos(videos: VideoClip[] | undefined, badge: 'fan' | 'official') {
     videosCont.innerHTML = '';
     if (!videos || videos.length === 0) {
       videosSec.style.display = 'none';
@@ -359,6 +359,24 @@ const { characters } = Astro.props;
         videosCont.appendChild(makeTikTokItem(v.id, v.label));
       }
     });
+
+    // Dla oficjalnego dubbingu — podpowiedź o ścieżce dźwiękowej
+    const existingNote = videosSec.querySelector('.char-modal__audio-track-note');
+    if (existingNote) existingNote.remove();
+
+    if (badge === 'official') {
+      const note = document.createElement('p');
+      note.className = 'char-modal__audio-track-note';
+      note.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        W ustawieniach wideo przełącz ścieżkę dźwiękową na język polski.
+      `;
+      videosSec.appendChild(note);
+    }
   }
 
   // ── Open / Close ──────────────────────────────────────────────────────────────
@@ -381,7 +399,7 @@ const { characters } = Astro.props;
 
     resetPlayerUI();
     initModalPlayer(char.audioId);
-    renderVideos(char.videos);
+    renderVideos(char.videos, char.badge);
 
     overlay.removeAttribute('hidden');
     requestAnimationFrame(() => {

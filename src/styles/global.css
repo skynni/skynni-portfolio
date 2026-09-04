@@ -837,6 +837,29 @@ ol {
   color: var(--c-ink-muted);
 }
 
+/* Notatka o ścieżce dźwiękowej — tylko przy oficjalnym dubbingu */
+.char-modal__audio-track-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--c-bg-alt);
+  border: 1px solid var(--c-border);
+  font-size: 0.78rem;
+  color: var(--c-ink-muted);
+  line-height: 1.45;
+}
+
+.char-modal__audio-track-note svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--c-ink-muted);
+}
+
 /* Miniatura YouTube */
 .char-modal__video-thumb {
   position: relative;
