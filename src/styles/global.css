@@ -64,6 +64,47 @@
 }
 
 /* ===========================
+   DARK MODE TOKENS
+   =========================== */
+html.dark {
+  /* Backgrounds */
+  --c-bg: #0d0d0f;
+  --c-bg-alt: #131316;
+  --c-surface: #1a1a1f;
+
+  /* Borders */
+  --c-border: rgba(255, 255, 255, 0.07);
+  --c-border-strong: rgba(255, 255, 255, 0.13);
+
+  /* Ink */
+  --c-ink-primary: #f0ede8;
+  --c-ink-secondary: #c4bdb4;
+  --c-ink-muted: #7a7874;
+  --c-ink-subtle: #4a4845;
+
+  /* Accent */
+  --c-accent: #e8e2d9;
+  --c-accent-hover: #f7f6f3;
+  --c-accent-light: rgba(232, 226, 217, 0.09);
+
+  /* Players */
+  --c-player-track: #2e2e35;
+  --c-player-progress: #e8e2d9;
+
+  /* Muzyka section — stays dark, slightly adjusted */
+  --c-muzyka-bg: #080809;
+  --c-muzyka-ink: #f7f6f3;
+  --c-muzyka-muted: rgba(247, 246, 243, 0.5);
+  --c-muzyka-border: rgba(255, 255, 255, 0.08);
+
+  /* Shadows — heavier in dark mode */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 20px 60px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ===========================
    RESET & BASE
    =========================== */
 *,
@@ -86,6 +127,7 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out);
 }
 
 img {
@@ -149,6 +191,14 @@ ol {
   transition: background var(--dur-med) var(--ease-out),
     border-color var(--dur-med) var(--ease-out),
     box-shadow var(--dur-med) var(--ease-out);
+}
+
+html.dark .nav {
+  background: rgba(13, 13, 15, 0.82);
+}
+
+html.dark .nav.scrolled {
+  background: rgba(13, 13, 15, 0.96);
 }
 
 .nav.scrolled {
@@ -290,6 +340,13 @@ ol {
   background-size: 32px 32px;
   -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 100%);
   mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* W ciemnym motywie — białe linie zamiast czarnych */
+html.dark .hero__bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
 }
 
 /* Noise texture overlay */
@@ -692,7 +749,7 @@ ol {
   z-index: 10;
   width: 36px;
   height: 36px;
-  background: rgba(247, 246, 243, 0.9);
+  background: var(--c-surface);
   border: 1px solid var(--c-border-strong);
   border-radius: 50%;
   display: flex;
@@ -708,7 +765,7 @@ ol {
 
 .char-modal__close:hover {
   background: var(--c-accent);
-  color: #fff;
+  color: var(--c-bg);
   border-color: transparent;
   transform: scale(1.1) rotate(90deg);
 }
@@ -1074,7 +1131,12 @@ ol {
 .player__btn svg {
   width: 14px;
   height: 14px;
-  color: white;
+  color: #fff;
+}
+
+/* W ciemnym motywie akcent jest kremowy — ikona musi być ciemna */
+html.dark .player__btn svg {
+  color: #0d0d0f;
 }
 
 .icon-play {
@@ -1339,6 +1401,16 @@ ol {
   transition: fill var(--dur-fast);
 }
 
+/* W ciemnym motywie koło Fiverr jest jasne — napis "fi" musi być ciemny */
+html.dark #social-fiverr .fiverr-glyph {
+  fill: #0d0d0f;
+}
+
+/* Na hover w dark mode: akcent jest kremowy, więc glyph też ciemny */
+html.dark #social-fiverr:hover .fiverr-glyph {
+  fill: #0d0d0f;
+}
+
 .kontakt__note {
   font-size: 0.8rem;
   color: var(--c-ink-subtle);
@@ -1458,6 +1530,11 @@ ol {
     gap: var(--space-sm);
     border-bottom: 1px solid var(--c-border);
     box-shadow: var(--shadow-md);
+    transition: background var(--dur-med) var(--ease-out);
+  }
+
+  html.dark .nav__links {
+    background: rgba(13, 13, 15, 0.98);
   }
 
   .nav__links.open {
@@ -1539,3 +1616,57 @@ ol {
     letter-spacing: 0.1em;
   }
 }
+
+/* ===========================
+   THEME TOGGLE BUTTON
+   =========================== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1.5px solid var(--c-border-strong);
+  cursor: pointer;
+  color: var(--c-ink-secondary);
+  transition:
+    background var(--dur-fast),
+    border-color var(--dur-fast),
+    color var(--dur-fast),
+    transform var(--dur-fast) var(--ease-spring);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--c-accent-light);
+  border-color: var(--c-ink-secondary);
+  color: var(--c-ink-primary);
+  transform: scale(1.1) rotate(15deg);
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+  transition: transform var(--dur-med) var(--ease-spring), opacity var(--dur-fast);
+}
+
+/* Sun icon — shown in dark mode */
+.theme-toggle .icon-sun {
+  display: none;
+}
+
+/* Moon icon — shown in light mode */
+.theme-toggle .icon-moon {
+  display: block;
+}
+
+html.dark .theme-toggle .icon-sun {
+  display: block;
+}
+
+html.dark .theme-toggle .icon-moon {
+  display: none;
+}
+
