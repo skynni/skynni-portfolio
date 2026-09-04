@@ -79,6 +79,17 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- ═══════════════════════════════════════════════
+         MOTYW — zapobiega miganiu (FOUC)
+    ═══════════════════════════════════════════════ -->
+    <script is:inline>
+      (function () {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════════
          FAVICON
     ═══════════════════════════════════════════════ -->
     <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
