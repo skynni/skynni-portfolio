@@ -32,6 +32,7 @@ const jsonLd = {
         'https://youtube.com/@skyynni',
         'https://www.tiktok.com/@skaynni',
         'https://www.facebook.com/skyynni',
+        'https://www.instagram.com/skynni.va/',
         'https://open.spotify.com/artist/2RNgnvqKJGvdbYMYWCZnw7',
         'https://www.fiverr.com/s/vvNNPzq',
         'https://dubbingpedia.pl/wiki/Damian_Pająk',
@@ -83,8 +84,12 @@ const jsonLd = {
     ═══════════════════════════════════════════════ -->
     <script is:inline>
       (function () {
-        if (localStorage.getItem('theme') === 'dark') {
-          document.documentElement.classList.add('dark');
+        try {
+          if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (_) {
+          // Brak dostępu do storage — pozostań przy motywie domyślnym (jasny)
         }
       })();
     </script>

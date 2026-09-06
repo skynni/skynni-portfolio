@@ -38,7 +38,7 @@ export const characters: Character[] = [
     badgeLabel: 'Oficjalny',
     imageSrc: '/assets/images/characters/norfeusz2.png',
     audioId: 'audio-norfeusz',
-    audioSrc: '/assets/audio/dubbing/Morpheus.mp3',
+    audioSrc: '/assets/audio/dubbing/morpheus.mp3',
     videos: [{ type: 'youtube', id: 'b7K3FnTbl2Q' }],
   },
   {
