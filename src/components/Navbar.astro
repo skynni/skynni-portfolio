@@ -51,9 +51,14 @@
 <script>
   // ── THEME: inicjalizacja przed renderem — zapobiega miganiu ───────────────────
   // Domyślny motyw: jasny. Ciemny tylko gdy użytkownik wcześniej go wybrał.
+  // try/catch: localStorage może być niedostępny (tryb prywatny, Safari ITP, CSP)
   (function () {
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark');
+    try {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (_) {
+      // Brak dostępu do storage — pozostań przy motywie domyślnym (jasny)
     }
   })();
 
@@ -62,7 +67,11 @@
 
   themeBtn.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    try {
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    } catch (_) {
+      // Brak dostępu do storage — motyw zmienia się, ale nie zostaje zapamiętany
+    }
 
     // Micro-animacja przycisku
     themeBtn.style.transform = 'scale(0.75) rotate(180deg)';
