@@ -187,8 +187,13 @@ const { characters } = Astro.props;
       e.stopPropagation();
       document.dispatchEvent(new CustomEvent('char-modal-audio-takeover', { detail: { audioId } }));
       if (audio.paused) {
-        audio.play().catch(() => {});
-        setPlayingUI(true);
+        // Bug 2: ustaw UI dopiero po potwierdzeniu sukcesu play()
+        audio.play().then(() => {
+          setPlayingUI(true);
+        }).catch(() => {
+          // Odtwarzanie nie powiodło się — cofnij UI do stanu Stop
+          resetPlayerUI();
+        });
       } else {
         audio.pause();
         setPlayingUI(false);
@@ -212,8 +217,12 @@ const { characters } = Astro.props;
       const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       audio.currentTime = ratio * audio.duration;
       if (audio.paused) {
-        audio.play().catch(() => {});
-        setPlayingUI(true);
+        // Bug 2: ustaw UI dopiero po potwierdzeniu sukcesu play()
+        audio.play().then(() => {
+          setPlayingUI(true);
+        }).catch(() => {
+          resetPlayerUI();
+        });
       }
     }
 
@@ -399,6 +408,16 @@ const { characters } = Astro.props;
 
     resetPlayerUI();
     initModalPlayer(char.audioId);
+
+    // Bug 1: synchronizuj ikony ze stanem audio — jeśli audio już gra (np. z karty),
+    // modal powinien od razu pokazywać ikonę Pause, nie Play
+    const activeAudio = document.getElementById(char.audioId) as HTMLAudioElement | null;
+    if (activeAudio && !activeAudio.paused) {
+      // Przejmij własność audio od karty — karta zresetuje swoje ikony
+      document.dispatchEvent(new CustomEvent('char-modal-audio-takeover', { detail: { audioId: char.audioId } }));
+      setPlayingUI(true);
+    }
+
     renderVideos(char.videos, char.badge);
 
     overlay.removeAttribute('hidden');

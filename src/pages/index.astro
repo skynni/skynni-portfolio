@@ -175,9 +175,15 @@ import { socials } from '../data/socials';
       }
 
       if (audioEl.paused) {
-        audioEl.play().catch(() => {});
-        setPlayingUI(true);
-        currentPlayer = { audioEl, resetUI };
+        // Bug 2: ustaw UI dopiero po potwierdzeniu sukcesu play()
+        audioEl.play().then(() => {
+          setPlayingUI(true);
+          currentPlayer = { audioEl, resetUI };
+        }).catch(() => {
+          // Odtwarzanie nie powiodło się — cofnij UI do stanu Stop
+          resetUI();
+          currentPlayer = null;
+        });
       } else {
         audioEl.pause();
         setPlayingUI(false);
@@ -212,9 +218,14 @@ import { socials } from '../data/socials';
       const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       audioEl.currentTime = ratio * audioEl.duration;
       if (audioEl.paused) {
-        audioEl.play().catch(() => {});
-        setPlayingUI(true);
-        currentPlayer = { audioEl, resetUI };
+        // Bug 2: ustaw UI dopiero po potwierdzeniu sukcesu play()
+        audioEl.play().then(() => {
+          setPlayingUI(true);
+          currentPlayer = { audioEl, resetUI };
+        }).catch(() => {
+          resetUI();
+          currentPlayer = null;
+        });
       }
     });
   }
@@ -225,11 +236,17 @@ import { socials } from '../data/socials';
     initPlayer(el);
   });
 
-  // Gdy modal przejmuje audio — zatrzymaj globalny player
+  // Gdy modal przejmuje audio — resetuj zawsze ikony karty,
+  // ale zatrzymuj audio tylko jeśli to INNY element
+  // (gdy modal dziedziczy ten sam audio, nie przerywaj odtwarzania)
   document.addEventListener('char-modal-audio-takeover', (e: Event) => {
     const detail = (e as CustomEvent<{ audioId: string }>).detail;
-    if (currentPlayer && currentPlayer.audioEl.id !== detail.audioId) {
-      currentPlayer.audioEl.pause();
+    if (currentPlayer) {
+      if (currentPlayer.audioEl.id !== detail.audioId) {
+        // Inny audio — zatrzymaj go
+        currentPlayer.audioEl.pause();
+      }
+      // Zawsze resetuj ikony karty
       currentPlayer.resetUI();
       currentPlayer = null;
     }
