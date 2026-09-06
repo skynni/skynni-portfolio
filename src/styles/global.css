@@ -683,6 +683,10 @@ html.dark .hero__bg-grid {
   transform: translateY(-1px);
 }
 
+html.dark .char-card__more-btn:hover {
+  color: #1a1a1a;
+}
+
 .char-card__more-btn svg {
   width: 14px;
   height: 14px;
