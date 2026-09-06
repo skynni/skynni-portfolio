@@ -49,18 +49,8 @@
 </nav>
 
 <script>
-  // ── THEME: inicjalizacja przed renderem — zapobiega miganiu ───────────────────
-  // Domyślny motyw: jasny. Ciemny tylko gdy użytkownik wcześniej go wybrał.
-  // try/catch: localStorage może być niedostępny (tryb prywatny, Safari ITP, CSP)
-  (function () {
-    try {
-      if (localStorage.getItem('theme') === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-    } catch (_) {
-      // Brak dostępu do storage — pozostań przy motywie domyślnym (jasny)
-    }
-  })();
+  // ── THEME: inicjalizacja motywu jest w Layout.astro (is:inline, przed renderem)
+  // Tu obsługujemy tylko przycisk toggle.
 
   // ── THEME: przycisk toggle ────────────────────────────────────────────────────
   const themeBtn = document.getElementById('theme-toggle-btn')!;

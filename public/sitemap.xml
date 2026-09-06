@@ -6,11 +6,11 @@
 
   <url>
     <loc>https://skynni.pl/</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-09-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="pl" href="https://skynni.pl/" />
-    
+
     <!-- Główne zdjęcie OG -->
     <image:image>
       <image:loc>https://skynni.pl/assets/images/og-cover.png</image:loc>
@@ -18,13 +18,47 @@
       <image:title>Damian „skynni" Pająk – Aktor Głosowy, Lektor &amp; Wokalista</image:title>
     </image:image>
 
-    <!-- Postać z Dubbingu -->
+    <!-- Postaci dubbingowe -->
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/nedward.png</image:loc>
+      <image:caption>Nedward – Office Place (oficjalny dubbing PL)</image:caption>
+      <image:title>Nedward Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/norfeusz2.png</image:loc>
+      <image:caption>Morpheus – Sunny Side Down (oficjalny dubbing PL)</image:caption>
+      <image:title>Morpheus Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
+
     <image:image>
       <image:loc>https://skynni.pl/assets/images/characters/gojo.png</image:loc>
       <image:caption>Gojo Satoru – Jujutsu Kaisen (fandubbing PL)</image:caption>
       <image:title>Gojo Satoru Dubbing – Damian skynni Pająk</image:title>
     </image:image>
-    
-    <!-- (Możesz tu dodać kolejne tagi <image:image> dla innych postaci z portfolio, jeśli chcesz je mocno pozycjonować w obrazkach) -->
+
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/morrison.png</image:loc>
+      <image:caption>Morrison – Devil May Cry (fandubbing PL)</image:caption>
+      <image:title>Morrison Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/valentino2.png</image:loc>
+      <image:caption>Valentino – Hazbin Hotel (fandubbing PL)</image:caption>
+      <image:title>Valentino Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/mordecai2.png</image:loc>
+      <image:caption>Mordecai – Lackadaisy (fandubbing PL)</image:caption>
+      <image:title>Mordecai Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://skynni.pl/assets/images/characters/tails.png</image:loc>
+      <image:caption>Tails – Sonic the Hedgehog (fandubbing PL)</image:caption>
+      <image:title>Tails Dubbing – Damian skynni Pająk</image:title>
+    </image:image>
   </url>
 </urlset>
