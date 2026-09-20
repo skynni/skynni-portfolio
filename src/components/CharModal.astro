@@ -181,7 +181,7 @@ const { characters } = Astro.props;
     if (!audio) return;
     currentAudioEl = audio;
 
-    if (audio.duration) timeEl.textContent = fmt(audio.duration);
+    if (audio.duration) timeEl.textContent = '0:00 / ' + fmt(audio.duration);
 
     function onPlay(e: Event) {
       e.stopPropagation();
@@ -204,12 +204,12 @@ const { characters } = Astro.props;
       if (!audio.duration) return;
       const pct = (audio.currentTime / audio.duration) * 100;
       progressEl.style.width = pct + '%';
-      timeEl.textContent = fmt(audio.currentTime);
+      timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
       trackEl.setAttribute('aria-valuenow', String(Math.round(pct)));
     }
 
-    function onLoaded() { timeEl.textContent = fmt(audio.duration); }
-    function onEnded()  { resetPlayerUI(); }
+    function onLoaded() { timeEl.textContent = '0:00 / ' + fmt(audio.duration); }
+    function onEnded()  { resetPlayerUI(); if (audio.duration) timeEl.textContent = '0:00 / ' + fmt(audio.duration); }
 
     function onTrackClick(e: MouseEvent) {
       if (!audio.duration) return;

@@ -119,6 +119,11 @@ html {
   font-size: 16px;
 }
 
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
 body {
   font-family: var(--font-body);
   background: var(--c-bg);
@@ -1167,10 +1172,11 @@ html.dark .player__btn svg {
   font-size: 0.72rem;
   color: var(--c-ink-muted);
   font-weight: 600;
-  min-width: 30px;
+  min-width: 72px;
   text-align: right;
   letter-spacing: 0.03em;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* ===========================

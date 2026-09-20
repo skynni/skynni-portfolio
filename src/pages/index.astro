@@ -160,7 +160,7 @@ import { socials } from '../data/socials';
     function resetUI() {
       setPlayingUI(false);
       progress!.style.width = '0%';
-      timeEl!.textContent = '0:00';
+      timeEl!.textContent = audioEl.duration ? `0:00 / ${formatTime(audioEl.duration)}` : '0:00';
       track!.setAttribute('aria-valuenow', '0');
     }
 
@@ -196,13 +196,13 @@ import { socials } from '../data/socials';
       if (!audioEl.duration) return;
       const pct = (audioEl.currentTime / audioEl.duration) * 100;
       progress.style.width = pct + '%';
-      timeEl.textContent = formatTime(audioEl.currentTime);
+      timeEl.textContent = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration)}`;
       track.setAttribute('aria-valuenow', String(Math.round(pct)));
     });
 
     // Load duration
     audioEl.addEventListener('loadedmetadata', () => {
-      timeEl.textContent = formatTime(audioEl.duration);
+      timeEl.textContent = `0:00 / ${formatTime(audioEl.duration)}`;
     });
 
     // Ended
