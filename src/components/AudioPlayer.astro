@@ -31,7 +31,7 @@ const {
 ---
 
 <div role="region" aria-label={regionLabel}>
-  <audio id={audioId} preload="none">
+  <audio id={audioId} preload="metadata">
     <source src={audioSrc} type={audioType} />
   </audio>
   <div class={`player ${playerClass}`} data-audio={audioId}>
