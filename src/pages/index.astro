@@ -236,6 +236,44 @@ import { socials } from '../data/socials';
     initPlayer(el);
   });
 
+  // ── VERSION TOGGLE (normalna / a cappella) ────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.version-toggle').forEach((toggle) => {
+    const trackId = toggle.dataset.trackId;
+    if (!trackId) return;
+
+    const btnNormal = toggle.querySelector<HTMLButtonElement>('[data-version="normal"]');
+    const btnAcapella = toggle.querySelector<HTMLButtonElement>('[data-version="acapella"]');
+    const playerNormal = document.querySelector<HTMLElement>(`.version-player--normal[data-track-id="${trackId}"]`);
+    const playerAcapella = document.querySelector<HTMLElement>(`.version-player--acapella[data-track-id="${trackId}"]`);
+
+    if (!btnNormal || !btnAcapella || !playerNormal || !playerAcapella) return;
+
+    function switchVersion(version: 'normal' | 'acapella') {
+      // Zatrzymaj aktywny audio jeśli należy do tego tracka
+      if (currentPlayer) {
+        const normalAudioId = playerNormal!.querySelector<HTMLAudioElement>('audio')?.id;
+        const acaAudioId = playerAcapella!.querySelector<HTMLAudioElement>('audio')?.id;
+        if (currentPlayer.audioEl.id === normalAudioId || currentPlayer.audioEl.id === acaAudioId) {
+          currentPlayer.audioEl.pause();
+          currentPlayer.resetUI();
+          currentPlayer = null;
+        }
+      }
+
+      const isNormal = version === 'normal';
+      btnNormal!.setAttribute('aria-pressed', String(isNormal));
+      btnNormal!.classList.toggle('version-toggle__btn--active', isNormal);
+      btnAcapella!.setAttribute('aria-pressed', String(!isNormal));
+      btnAcapella!.classList.toggle('version-toggle__btn--active', !isNormal);
+
+      playerNormal!.hidden = !isNormal;
+      playerAcapella!.hidden = isNormal;
+    }
+
+    btnNormal.addEventListener('click', () => switchVersion('normal'));
+    btnAcapella.addEventListener('click', () => switchVersion('acapella'));
+  });
+
   // Gdy modal przejmuje audio — resetuj zawsze ikony karty,
   // ale zatrzymuj audio tylko jeśli to INNY element
   // (gdy modal dziedziczy ten sam audio, nie przerywaj odtwarzania)
