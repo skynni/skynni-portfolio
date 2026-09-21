@@ -1253,6 +1253,58 @@ html.dark .player__btn svg {
   color: var(--c-muzyka-muted);
 }
 
+/* ── Title row (tytuł + przełącznik wersji) ─────────────────────────────── */
+.music-track__title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs, 0.5rem);
+  margin-bottom: 2px;
+}
+
+.music-track__title-row .music-track__title {
+  margin-bottom: 0;
+}
+
+/* ── Version toggle (normalna / a cappella) ─────────────────────────────── */
+.version-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.version-toggle__btn {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--c-muzyka-muted, rgba(255,255,255,0.5));
+  transition: background var(--dur-fast, 150ms), color var(--dur-fast, 150ms);
+}
+
+.version-toggle__btn--active,
+.version-toggle__btn[aria-pressed="true"] {
+  background: var(--c-muzyka-ink, #fff);
+  color: #1a1a2e;
+}
+
+.version-toggle__btn:not(.version-toggle__btn--active):hover,
+.version-toggle__btn[aria-pressed="false"]:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--c-muzyka-ink, #fff);
+}
+
+
 .music-track__player {
   flex-shrink: 0;
   width: min(320px, 100%);
