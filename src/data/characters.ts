@@ -20,6 +20,17 @@ export interface Character {
 
 export const characters: Character[] = [
   {
+    id: 'char-mujoob',
+    name: 'Mujoob',
+    source: 'Adventures of Quilbert Quail',
+    badge: 'official',
+    badgeLabel: 'Oficjalny',
+    imageSrc: '/assets/images/characters/mujoob.png',
+    audioId: 'audio-mujoob',
+    audioSrc: '/assets/audio/dubbing/mujoob.mp3',
+    videos: [{ type: 'youtube', id: '1HQsZm9FxkU' }],
+  },
+  {
     id: 'char-nedward',
     name: 'Nedward',
     source: 'Office Place',
