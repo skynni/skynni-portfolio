@@ -6,6 +6,7 @@ import CharCard from '../components/CharCard.astro';
 import CharModal from '../components/CharModal.astro';
 import MusicTrack from '../components/MusicTrack.astro';
 import LektorCard from '../components/LektorCard.astro';
+import FloatingPlayer from '../components/FloatingPlayer.astro';
 
 import { characters } from '../data/characters';
 import { tracks } from '../data/tracks';
@@ -117,6 +118,8 @@ import { socials } from '../data/socials';
       </div>
     </div>
   </section>
+  <!-- FLOATING PLAYER -->
+  <FloatingPlayer />
 </Layout>
 
 <script>
@@ -134,6 +137,50 @@ import { socials } from '../data/socials';
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
+  }
+
+  // ── Floating Player — metadane nagrań ────────────────────────────────────────
+  // Mapa audioId → { title, section } używana do wyświetlenia tytułu
+  // w pływającym playerze.
+  interface AudioMeta { title: string; section: string; }
+  const AUDIO_META: Record<string, AudioMeta> = {};
+
+  // Wypełnij z tracków muzycznych
+  document.querySelectorAll<HTMLElement>('.music-track').forEach((el) => {
+    const titleEl = el.querySelector('.music-track__title');
+    const title = titleEl?.textContent?.trim() ?? 'Utwór';
+    el.querySelectorAll<HTMLAudioElement>('audio').forEach((audio) => {
+      if (audio.id) AUDIO_META[audio.id] = { title, section: 'muzyka' };
+    });
+  });
+
+  // Wypełnij z kart lektorskich
+  document.querySelectorAll<HTMLElement>('.lektor-card').forEach((el) => {
+    const titleEl = el.querySelector('.lektor-card__title');
+    const title = titleEl?.textContent?.trim() ?? 'Nagranie lektorskie';
+    el.querySelectorAll<HTMLAudioElement>('audio').forEach((audio) => {
+      if (audio.id) AUDIO_META[audio.id] = { title, section: 'lektorstwo' };
+    });
+  });
+
+  // Wypełnij z kart postaci (dubbing)
+  document.querySelectorAll<HTMLElement>('.char-card').forEach((el) => {
+    const titleEl = el.querySelector('.char-card__name');
+    const title = titleEl?.textContent?.trim() ?? 'Postać';
+    el.querySelectorAll<HTMLAudioElement>('audio').forEach((audio) => {
+      if (audio.id) AUDIO_META[audio.id] = { title, section: 'dubbing' };
+    });
+  });
+
+  function emitFpPlay(audioEl: HTMLAudioElement) {
+    const meta = AUDIO_META[audioEl.id];
+    document.dispatchEvent(new CustomEvent('fp:play', {
+      detail: {
+        audioEl,
+        title: meta?.title ?? 'Nagranie',
+        section: meta?.section ?? 'lektorstwo',
+      },
+    }));
   }
 
   function initPlayer(playerEl: HTMLElement) {
@@ -179,6 +226,7 @@ import { socials } from '../data/socials';
         audioEl.play().then(() => {
           setPlayingUI(true);
           currentPlayer = { audioEl, resetUI };
+          emitFpPlay(audioEl);
         }).catch(() => {
           // Odtwarzanie nie powiodło się — cofnij UI do stanu Stop
           resetUI();
@@ -222,6 +270,7 @@ import { socials } from '../data/socials';
         audioEl.play().then(() => {
           setPlayingUI(true);
           currentPlayer = { audioEl, resetUI };
+          emitFpPlay(audioEl);
         }).catch(() => {
           resetUI();
           currentPlayer = null;
