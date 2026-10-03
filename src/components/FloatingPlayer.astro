@@ -1,0 +1,317 @@
+---
+// FloatingPlayer.astro — globalny player pływający w prawym dolnym rogu
+// Pojawia się automatycznie gdy jakikolwiek <audio> na stronie zaczyna grać.
+// Ukrywa się gdy audio jest pauzowane / zakończone.
+---
+
+<div
+  class="fp"
+  id="floating-player"
+  aria-label="Odtwarzacz audio"
+  role="region"
+  aria-live="polite"
+  hidden
+>
+  <!-- Górna belka: miniatura sekcji + tytuł nagrania + przycisk zamknięcia -->
+  <div class="fp__header">
+    <div class="fp__source-badge" id="fp-source-badge" aria-hidden="true"></div>
+    <div class="fp__title-wrap">
+      <p class="fp__label" id="fp-label">Odtwarzanie</p>
+      <p class="fp__title" id="fp-title"></p>
+    </div>
+    <button class="fp__close" id="fp-close" aria-label="Zamknij player">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Pasek postępu -->
+  <div
+    class="fp__track"
+    id="fp-track"
+    role="slider"
+    aria-label="Postęp odtwarzania"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0"
+    tabindex="0"
+  >
+    <div class="fp__progress" id="fp-progress"></div>
+    <div class="fp__thumb" id="fp-thumb"></div>
+  </div>
+
+  <!-- Dolna belka: czas + kontrolki + głośność -->
+  <div class="fp__controls">
+    <span class="fp__time" id="fp-time" aria-live="off">0:00 / 0:00</span>
+
+    <button
+      class="fp__play-btn"
+      id="fp-play-btn"
+      aria-label="Odtwórz / Zatrzymaj"
+      aria-pressed="false"
+    >
+      <svg class="fp__icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <polygon points="5,3 19,12 5,21" />
+      </svg>
+      <svg class="fp__icon-pause hidden" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <rect x="6" y="4" width="4" height="16" rx="1" />
+        <rect x="14" y="4" width="4" height="16" rx="1" />
+      </svg>
+    </button>
+
+    <div class="fp__volume" id="fp-volume-group">
+      <button class="fp__mute-btn" id="fp-mute-btn" aria-label="Wycisz / Przywróć dźwięk">
+        <svg class="fp__vol-icon fp__vol-icon--full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        </svg>
+        <svg class="fp__vol-icon fp__vol-icon--low hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        </svg>
+        <svg class="fp__vol-icon fp__vol-icon--mute hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <line x1="23" y1="9" x2="17" y2="15" />
+          <line x1="17" y1="9" x2="23" y2="15" />
+        </svg>
+      </button>
+      <input
+        class="fp__volume-slider"
+        id="fp-volume-slider"
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value="1"
+        aria-label="Głośność"
+      />
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── FLOATING PLAYER ENGINE ───────────────────────────────────────────────────
+  const fp          = document.getElementById('floating-player')!;
+  const fpTitle     = document.getElementById('fp-title')!;
+  const fpLabel     = document.getElementById('fp-label')!;
+  const fpBadge     = document.getElementById('fp-source-badge')!;
+  const fpTrack     = document.getElementById('fp-track')!;
+  const fpProgress  = document.getElementById('fp-progress')!;
+  const fpThumb     = document.getElementById('fp-thumb')!;
+  const fpTime      = document.getElementById('fp-time')!;
+  const fpPlayBtn   = document.getElementById('fp-play-btn')!;
+  const fpClose     = document.getElementById('fp-close')!;
+  const fpMuteBtn   = document.getElementById('fp-mute-btn')!;
+  const fpVolSlider = document.getElementById('fp-volume-slider') as HTMLInputElement;
+
+  const fpIconPlay  = fpPlayBtn.querySelector<SVGElement>('.fp__icon-play')!;
+  const fpIconPause = fpPlayBtn.querySelector<SVGElement>('.fp__icon-pause')!;
+  const volFull     = fpMuteBtn.querySelector<SVGElement>('.fp__vol-icon--full')!;
+  const volLow      = fpMuteBtn.querySelector<SVGElement>('.fp__vol-icon--low')!;
+  const volMute     = fpMuteBtn.querySelector<SVGElement>('.fp__vol-icon--mute')!;
+
+  let activeAudio: HTMLAudioElement | null = null;
+  let audioCleanups: (() => void)[] = [];
+  let prevVolume = 1;
+  let isDragging = false;
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function fmt(s: number): string {
+    if (!isFinite(s) || isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  function setPlayingUI(playing: boolean) {
+    fpIconPlay.classList.toggle('hidden', playing);
+    fpIconPause.classList.toggle('hidden', !playing);
+    fpPlayBtn.setAttribute('aria-pressed', String(playing));
+  }
+
+  function updateVolIcon(vol: number, muted: boolean) {
+    const isMuted = muted || vol === 0;
+    volFull.classList.toggle('hidden', isMuted || vol <= 0.4);
+    volLow.classList.toggle('hidden', isMuted || vol > 0.4);
+    volMute.classList.toggle('hidden', !isMuted);
+  }
+
+  function updateProgress() {
+    if (!activeAudio || !activeAudio.duration || isDragging) return;
+    const pct = (activeAudio.currentTime / activeAudio.duration) * 100;
+    fpProgress.style.width = pct + '%';
+    fpThumb.style.left = pct + '%';
+    fpTrack.setAttribute('aria-valuenow', String(Math.round(pct)));
+    fpTime.textContent = fmt(activeAudio.currentTime) + ' / ' + fmt(activeAudio.duration);
+  }
+
+  function showPlayer() {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    fp.removeAttribute('hidden');
+    fp.getBoundingClientRect(); // force reflow
+    fp.classList.add('fp--visible');
+  }
+
+  function hidePlayer() {
+    fp.classList.remove('fp--visible');
+    setTimeout(() => fp.setAttribute('hidden', ''), 380);
+  }
+
+  // ── Seek ──────────────────────────────────────────────────────────────────
+  function seekTo(clientX: number) {
+    if (!activeAudio || !activeAudio.duration) return;
+    const rect = fpTrack.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    activeAudio.currentTime = ratio * activeAudio.duration;
+    fpProgress.style.width = (ratio * 100) + '%';
+    fpThumb.style.left = (ratio * 100) + '%';
+    fpTime.textContent = fmt(activeAudio.currentTime) + ' / ' + fmt(activeAudio.duration);
+  }
+
+  fpTrack.addEventListener('mousedown', (e) => { isDragging = true; seekTo(e.clientX); });
+  document.addEventListener('mousemove', (e) => { if (isDragging) seekTo(e.clientX); });
+  document.addEventListener('mouseup', () => { isDragging = false; });
+  fpTrack.addEventListener('touchstart', (e) => { isDragging = true; seekTo(e.touches[0].clientX); }, { passive: true });
+  document.addEventListener('touchmove', (e) => { if (isDragging) seekTo(e.touches[0].clientX); }, { passive: true });
+  document.addEventListener('touchend', () => { isDragging = false; });
+
+  fpTrack.addEventListener('keydown', (e) => {
+    if (!activeAudio || !activeAudio.duration) return;
+    if (e.key === 'ArrowRight') activeAudio.currentTime = Math.min(activeAudio.duration, activeAudio.currentTime + 5);
+    if (e.key === 'ArrowLeft')  activeAudio.currentTime = Math.max(0, activeAudio.currentTime - 5);
+  });
+
+  // ── Volume ────────────────────────────────────────────────────────────────
+  fpVolSlider.addEventListener('input', () => {
+    const vol = parseFloat(fpVolSlider.value);
+    if (activeAudio) { activeAudio.volume = vol; activeAudio.muted = vol === 0; }
+    if (vol > 0) prevVolume = vol;
+    updateVolIcon(vol, vol === 0);
+  });
+
+  fpMuteBtn.addEventListener('click', () => {
+    if (!activeAudio) return;
+    if (activeAudio.muted || activeAudio.volume === 0) {
+      activeAudio.muted = false;
+      activeAudio.volume = prevVolume > 0 ? prevVolume : 0.8;
+      fpVolSlider.value = String(activeAudio.volume);
+      updateVolIcon(activeAudio.volume, false);
+    } else {
+      prevVolume = activeAudio.volume;
+      activeAudio.muted = true;
+      fpVolSlider.value = '0';
+      updateVolIcon(0, true);
+    }
+  });
+
+  // ── Play/Pause ────────────────────────────────────────────────────────────
+  fpPlayBtn.addEventListener('click', () => {
+    if (!activeAudio) return;
+    if (activeAudio.paused) {
+      activeAudio.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+    } else {
+      activeAudio.pause();
+      setPlayingUI(false);
+    }
+  });
+
+  // ── Close ─────────────────────────────────────────────────────────────────
+  fpClose.addEventListener('click', () => {
+    if (activeAudio && !activeAudio.paused) activeAudio.pause();
+    hidePlayer();
+    cleanup();
+  });
+
+  // ── Section badge ─────────────────────────────────────────────────────────
+  const SECTION_META: Record<string, { label: string; icon: string; color: string }> = {
+    dubbing: {
+      label: 'Dubbing',
+      color: 'rgba(124,58,237,0.2)',
+      icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`,
+    },
+    muzyka: {
+      label: 'Muzyka',
+      color: 'rgba(255,255,255,0.08)',
+      icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+    },
+    lektorstwo: {
+      label: 'Lektorstwo',
+      color: 'rgba(5,150,105,0.2)',
+      icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
+    },
+  };
+
+  // ── Cleanup ───────────────────────────────────────────────────────────────
+  function cleanup() {
+    audioCleanups.forEach(fn => fn());
+    audioCleanups = [];
+    activeAudio = null;
+  }
+
+  // ── Attach audio ──────────────────────────────────────────────────────────
+  function attachAudio(audio: HTMLAudioElement, title: string, section: string) {
+    cleanup();
+    activeAudio = audio;
+
+    const meta = SECTION_META[section] ?? SECTION_META['lektorstwo'];
+    fpLabel.textContent = meta.label;
+    fpTitle.textContent = title;
+    fpBadge.innerHTML = meta.icon;
+    fpBadge.style.background = meta.color;
+
+    fpVolSlider.value = String(audio.muted ? 0 : audio.volume);
+    updateVolIcon(audio.volume, audio.muted);
+
+    if (audio.duration) {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      fpProgress.style.width = pct + '%';
+      fpThumb.style.left = pct + '%';
+      fpTime.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+    } else {
+      fpProgress.style.width = '0%';
+      fpThumb.style.left = '0%';
+      fpTime.textContent = '0:00 / 0:00';
+    }
+
+    const onTimeUpdate  = () => updateProgress();
+    const onLoadedMeta  = () => { fpTime.textContent = '0:00 / ' + fmt(audio.duration); };
+    const onPlay  = () => { setPlayingUI(true); showPlayer(); };
+    const onPause = () => { setPlayingUI(false); };
+    const onEnded = () => {
+      setPlayingUI(false);
+      fpProgress.style.width = '0%';
+      fpThumb.style.left = '0%';
+      fpTime.textContent = '0:00 / ' + fmt(audio.duration);
+    };
+
+    audio.addEventListener('timeupdate',     onTimeUpdate);
+    audio.addEventListener('loadedmetadata', onLoadedMeta);
+    audio.addEventListener('play',           onPlay);
+    audio.addEventListener('pause',          onPause);
+    audio.addEventListener('ended',          onEnded);
+
+    audioCleanups = [
+      () => audio.removeEventListener('timeupdate',     onTimeUpdate),
+      () => audio.removeEventListener('loadedmetadata', onLoadedMeta),
+      () => audio.removeEventListener('play',           onPlay),
+      () => audio.removeEventListener('pause',          onPause),
+      () => audio.removeEventListener('ended',          onEnded),
+    ];
+
+    setPlayingUI(!audio.paused);
+    showPlayer();
+  }
+
+  // ── Listen for global fp:play event ───────────────────────────────────────
+  document.addEventListener('fp:play', (e: Event) => {
+    const { audioEl, title, section } = (e as CustomEvent<{
+      audioEl: HTMLAudioElement;
+      title: string;
+      section: string;
+    }>).detail;
+    attachAudio(audioEl, title, section);
+  });
+</script>

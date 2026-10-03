@@ -173,7 +173,7 @@ const { characters } = Astro.props;
   }
 
   // ── Audio Player ──────────────────────────────────────────────────────────────
-  function initModalPlayer(audioId: string) {
+  function initModalPlayer(audioId: string, charName: string = 'Nagranie') {
     audioCleanups.forEach(fn => fn());
     audioCleanups = [];
 
@@ -190,6 +190,9 @@ const { characters } = Astro.props;
         // Bug 2: ustaw UI dopiero po potwierdzeniu sukcesu play()
         audio.play().then(() => {
           setPlayingUI(true);
+          document.dispatchEvent(new CustomEvent('fp:play', {
+            detail: { audioEl: audio, title: charName, section: 'dubbing' },
+          }));
         }).catch(() => {
           // Odtwarzanie nie powiodło się — cofnij UI do stanu Stop
           resetPlayerUI();
@@ -220,6 +223,9 @@ const { characters } = Astro.props;
         // Bug 2: ustaw UI dopiero po potwierdzeniu sukcesu play()
         audio.play().then(() => {
           setPlayingUI(true);
+          document.dispatchEvent(new CustomEvent('fp:play', {
+            detail: { audioEl: audio, title: charName, section: 'dubbing' },
+          }));
         }).catch(() => {
           resetPlayerUI();
         });
@@ -407,7 +413,7 @@ const { characters } = Astro.props;
       (char.badge === 'fan' ? 'char-card__badge--fan' : 'char-card__badge--official');
 
     resetPlayerUI();
-    initModalPlayer(char.audioId);
+    initModalPlayer(char.audioId, char.name);
 
     // Bug 1: synchronizuj ikony ze stanem audio — jeśli audio już gra (np. z karty),
     // modal powinien od razu pokazywać ikonę Pause, nie Play
@@ -416,6 +422,10 @@ const { characters } = Astro.props;
       // Przejmij własność audio od karty — karta zresetuje swoje ikony
       document.dispatchEvent(new CustomEvent('char-modal-audio-takeover', { detail: { audioId: char.audioId } }));
       setPlayingUI(true);
+      // Poinformuj floating player o zmianie kontekstu
+      document.dispatchEvent(new CustomEvent('fp:play', {
+        detail: { audioEl: activeAudio, title: char.name, section: 'dubbing' },
+      }));
     }
 
     renderVideos(char.videos, char.badge);
